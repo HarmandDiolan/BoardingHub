@@ -4,6 +4,13 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Tenant;
+use App\Models\TenantRequest;
+use App\Http\Requests\StoreTenantRequest;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\AdminPasswordMail;
+
 class SubdomainController extends Controller
 {
     /**
@@ -11,7 +18,9 @@ class SubdomainController extends Controller
      */
     public function index()
     {
-        //
+        $requests = TenantRequest::orderBy('created_at', 'desc')->get();
+
+        return view('central.requests', compact('requests'));
     }
 
     /**
@@ -25,11 +34,15 @@ class SubdomainController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreTenantRequest $request)
     {
-        $tenant = Tenant::create(['id' => $request->subdomain]);
-        $tenant->domains()->create(['domain' => $request->subdomain . '.localhost']);
-        return back();
+        TenantRequest::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'subdomain' => $request->subdomain,
+        ]);
+    
+        return back()->with('success', 'Your request has been submitted and is pending approval.');
     }
 
     /**
@@ -62,5 +75,37 @@ class SubdomainController extends Controller
     public function destroy(string $id)
     {
         //
+    }
+
+    public function approve($id)
+    {
+
+        $request = TenantRequest::findOrFail($id);
+
+        if ($request->status === 'approved') {
+            return back()->with('info', 'Already approved.');
+        }
+
+        $password = 'password';
+
+        // Create the actual tenant
+        $tenant = Tenant::create(['id' => $request->subdomain]);
+        $tenant->domains()->create(['domain' => $request->subdomain . '.localhost']);
+
+        $admin = \App\Models\User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($password),
+            'tenant_id' => $tenant->id, 
+            'role' => 'admin', 
+        ]); 
+
+        $domain = $request->subdomain . '.localhost:8000';
+        Mail::to($request->email)->send(new AdminPasswordMail($request->name, $password, $domain, $request->email));
+
+        $request->status = 'approved';
+        $request->save();
+
+        return back()->with('success', 'Tenant approved and database created.');
     }
 }
