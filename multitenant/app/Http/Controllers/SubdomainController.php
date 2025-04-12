@@ -92,6 +92,8 @@ class SubdomainController extends Controller
         $tenant = Tenant::create(['id' => $request->subdomain]);
         $tenant->domains()->create(['domain' => $request->subdomain . '.localhost']);
 
+        tenancy()->initialize($tenant);
+
         $admin = \App\Models\User::create([
             'name' => $request->name,
             'email' => $request->email,
@@ -103,6 +105,8 @@ class SubdomainController extends Controller
         $domain = $request->subdomain . '.localhost:8000';
         Mail::to($request->email)->send(new AdminPasswordMail($request->name, $password, $domain, $request->email));
 
+        tenancy()->end();
+        
         $request->status = 'approved';
         $request->save();
 
