@@ -13,7 +13,7 @@ class Tenant extends BaseTenant implements TenantWithDatabase
 
     public function admins()
     {
-        return $this->hasMany(Admin::class);  // Assuming you have an Admin model
+        return $this->hasMany(Admin::class); 
     }
     
 }

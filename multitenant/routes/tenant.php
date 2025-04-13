@@ -6,6 +6,7 @@ use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
 use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
+use App\Http\Controllers\TenantLoginController;
 
 /*
 |--------------------------------------------------------------------------
@@ -23,12 +24,16 @@ Route::middleware([
     InitializeTenancyByDomain::class,
     PreventAccessFromCentralDomains::class,
 ])->group(function () {
-
     Route::get('/', function () {
-        dd(\App\Models\User::query()->get());
-        return 'This is your multi-tenant application. The id of the current tenant is ' . tenant('id');
-
+        return tenant();
     });
+
+    Route::get('/whoami', function () {
+        return 'Tenant ID: ' . optional(tenant())->id;
+    });
+
+    Route::get('login', [TenantLoginController::class, 'showLoginForm'])->name('tenant.login');
+    Route::post('login', [TenantLoginController::class, 'login'])->name('tenant.login.submit');
 
     Route::get('users/create', [UserController::class, 'create'])->name('users.create');
     Route::post('users', [UserController::class, 'store'])->name('users.store');

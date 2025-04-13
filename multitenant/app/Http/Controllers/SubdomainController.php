@@ -79,7 +79,6 @@ class SubdomainController extends Controller
 
     public function approve($id)
     {
-
         $request = TenantRequest::findOrFail($id);
 
         if ($request->status === 'approved') {
@@ -89,26 +88,30 @@ class SubdomainController extends Controller
         $password = 'password';
 
         // Create the actual tenant
-        $tenant = Tenant::create(['id' => $request->subdomain]);
+        $tenant = Tenant::create(['id' => $request->subdomain, 'tenancy_db_name' => 'tenant' . Str::ucfirst($request->subdomain)]);
         $tenant->domains()->create(['domain' => $request->subdomain . '.localhost']);
 
+        // Initialize tenant's database
         tenancy()->initialize($tenant);
 
+        // Create the admin user for the tenant
         $admin = \App\Models\User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($password),
-            'tenant_id' => $tenant->id, 
-            'role' => 'admin', 
-        ]); 
+            'role' => 'admin',
+        ]);
 
+        // Send admin credentials email
         $domain = $request->subdomain . '.localhost:8000';
         Mail::to($request->email)->send(new AdminPasswordMail($request->name, $password, $domain, $request->email));
 
-        tenancy()->end();
-        
+        // Mark the tenant request as approved
         $request->status = 'approved';
         $request->save();
+
+        // End tenant context
+        tenancy()->end();
 
         return back()->with('success', 'Tenant approved and database created.');
     }

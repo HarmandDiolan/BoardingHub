@@ -32,9 +32,11 @@ class UserController extends Controller
         User::create([
             'name' => $request->name,
             'email' => $request->email,
-            'password' => Hash::make($request->password)
+            'password' => Hash::make($request->password),
+            'tenant_id' => tenant('id'),
         ]);
-        return back();
+
+        return redirect()->route('users.create')->with('success', 'User created successfully!');
     }
 
     /**
