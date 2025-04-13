@@ -13,21 +13,33 @@
     
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-</head>
-<body class="font-sans antialiased">
-    <div class="min-h-screen bg-gray-100 dark:bg-gray-900">
-        <div class="max-w-lg mx-auto py-12 px-6">
-            <div class="bg-white p-6 rounded shadow-lg">
-                <h2 class="text-2xl font-semibold mb-4">Tenant Login</h2>
+    
+    <!-- Tailwind CSS CDN for smooth UI effects -->
+    <script src="https://cdn.tailwindcss.com"></script>
 
-                <form method="POST" action="{{ route('tenant.login') }}">
-                    @csrf
-                    <input type="text" name="email" placeholder="Email" required>
-                    <input type="password" name="password" placeholder="Password" required>
-                    <button type="submit">Login</button>
-                </form>
+</head>
+<body class="font-sans bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 min-h-screen flex justify-center items-center">
+
+    <div class="bg-white p-8 rounded-xl shadow-xl w-full max-w-md">
+        <h2 class="text-3xl font-semibold text-center text-gray-800 mb-8">Tenant Login</h2>
+
+        <form method="POST" action="{{ route('tenant.login') }}" class="space-y-6">
+            @csrf
+            <div>
+                <input type="email" name="email" placeholder="Email" required class="w-full px-4 py-2 text-gray-700 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-300" />
             </div>
+            <div>
+                <input type="password" name="password" placeholder="Password" required class="w-full px-4 py-2 text-gray-700 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-300" />
+            </div>
+            <div>
+                <button type="submit" class="w-full py-2 text-white bg-indigo-600 hover:bg-indigo-700 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-300">Login</button>
+            </div>
+        </form>
+
+        <div class="mt-6 text-center">
+            <p class="text-sm text-gray-600">Don't have an account? <a href="{{ route('tenant.register') }}" class="text-indigo-600 hover:underline">Sign up</a></p>
         </div>
     </div>
+
 </body>
 </html>

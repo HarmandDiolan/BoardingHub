@@ -9,7 +9,6 @@ use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
 use App\Http\Controllers\TenantLoginController;
 use App\Http\Controllers\AdminController;
 
-
 /*
 |--------------------------------------------------------------------------
 | Tenant Routes
@@ -34,9 +33,14 @@ Route::middleware([
         return 'Tenant ID: ' . optional(tenant())->id;
     });
 
-    Route::get('login', [TenantLoginController::class, 'showLoginForm'])->name('tenant.login');
-    Route::post('login', [TenantLoginController::class, 'login'])->name('tenant.login.submit');
+    Route::get('tenant-login', [TenantLoginController::class, 'showLoginForm'])->name('tenant.login');
+    Route::post('tenant-login', [TenantLoginController::class, 'login'])->name('tenant.login.submit');
+    Route::get('tenant-login', [TenantLoginController::class, 'showLoginForm'])->name('tenant.login');
+
     Route::get('/admin/dashboard', [AdminController::class, 'index'])->name('tenant.admin.dashboard');
+
+    Route::get('tenant/register', [TenantLoginController::class, 'showRegisterForm'])->name('tenant.register.form');
+    Route::post('tenant/register', [TenantLoginController::class, 'TenantRegister'])->name('tenant.register');
 
     Route::get('users/create', [UserController::class, 'create'])->name('users.create');
     Route::post('users', [UserController::class, 'store'])->name('users.store');
