@@ -17,9 +17,10 @@ foreach (config('tenancy.central_domains') as $domain) {
         Route::post('subdomain', [SubdomainController::class,'store'])->name('subdomain.store');
         
 
-        Route::domain('tenant.localhost')->group(function () {
+        Route::domain('tenant.localhost')->middleware(['auth'])->group(function () {
             Route::get('/admin/dashboard', [AdminController::class, 'index'])->name('tenant.admin.dashboard');
         });
+        
         // Tenant login routes
 
     });
