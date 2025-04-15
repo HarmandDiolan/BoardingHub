@@ -5,7 +5,11 @@
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css">
 <link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.bootstrap5.css">
-
+@if (session('error'))
+    <div class="alert alert-danger">
+        {{ session('error') }}
+    </div>
+@endif
     <div class="container py-4">
         <h2 class="mb-3">Subdomain Requests</h2>
 
@@ -39,12 +43,16 @@
                                         </button>
                                     </form>
                                     @endif
-                                    <a href="#" title="Payment">
+                                    <a href="#" title="Plan">
                                         <i class="fa fa-credit-card text-primary"></i>
                                     </a>
-                                    <a href="#" title="Reject">
-                                        <i class="fa fa-close text-danger"></i>
-                                    </a>    
+                                    <form action="{{ route('subdomain.destroy', $request->subdomain) }}" method="POST">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" style="border: none; background: transparent;" title="Reject" onclick="return confirm('Are you sure you want to delete this request?')">
+                                            <i class="fa fa-close text-danger"></i>
+                                        </button>
+                                    </form>
                                         <form action="{{route('subdomain.update', $request->subdomain)}}" method="POST">
                                             @csrf
                                             @method('PUT')
@@ -65,6 +73,7 @@
     <script src="https://cdn.datatables.net/2.2.2/js/dataTables.js"></script>
     <script src="https://cdn.datatables.net/2.2.2/js/dataTables.bootstrap5.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+
     <script>
         $(document).ready(function () {
             $('#example').DataTable();

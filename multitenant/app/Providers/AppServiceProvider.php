@@ -26,5 +26,6 @@ class AppServiceProvider extends ServiceProvider
                 abort(403, 'This tenant is currently disabeld.');
             }
         });
+
     }
 }

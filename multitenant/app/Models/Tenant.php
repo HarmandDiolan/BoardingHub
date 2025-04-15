@@ -19,5 +19,7 @@ class Tenant extends BaseTenant implements TenantWithDatabase
         'data' => 'array',
         'disabled' => 'boolean',
     ];
+
+    protected $table = 'tenants';
     
 }

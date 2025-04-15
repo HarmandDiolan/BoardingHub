@@ -16,7 +16,8 @@ foreach (config('tenancy.central_domains') as $domain) {
         Route::post('/subdomain/approve/{id}', [SubdomainController::class, 'approve'])->name('subdomain.approve');
         Route::post('subdomain', [SubdomainController::class,'store'])->name('subdomain.store');
         Route::put('/subdomain/{id}', [SubdomainController::class, 'update'])->name('subdomain.update');
-
+        Route::delete('/subdomain/{id}', [SubdomainController::class, 'destroy'])->name('subdomain.destroy');
+        
         Route::domain('tenant.localhost')->middleware(['auth'])->group(function () {
             Route::get('/admin/dashboard', [AdminController::class, 'index'])->name('tenant.admin.dashboard');
         });

@@ -10,6 +10,9 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\AdminPasswordMail;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+
 
 class SubdomainController extends Controller
 {
@@ -79,8 +82,31 @@ class SubdomainController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $tenant = Tenant::where('id', $id)->first(); 
+    
+        if (!$tenant) {
+            return back()->with('error', "Tenant with ID {$id} does not exist.");
+        }
+        
+        try {
+            $dbName = $tenant->database()->getName();
+    
+            tenancy()->initialize($tenant);
+            tenancy()->end();
+    
+            $tenant->domains()->delete();
+            $tenant->delete();
+    
+            DB::statement("DROP DATABASE IF EXISTS $dbName");
+    
+            TenantRequest::where('subdomain', $tenant->id)->delete();
+    
+        } catch (\Exception $e) {
+            return redirect()->route('subdomain.index')->with('error', 'An error occurred while deleting the tenant.');
+        }
+        return redirect()->route('subdomain.index')->with('success', 'Tenant deleted successfully.');
     }
+    
 
     public function approve($id)
     {
