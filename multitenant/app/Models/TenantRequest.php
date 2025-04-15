@@ -11,4 +11,8 @@ class TenantRequest extends Model
 
     protected $fillable = ['name', 'email', 'subdomain', 'status'];
 
+    public function tenant(){
+        return $this->hasOne(Tenant::class, 'id', 'subdomain');
+    }
+
 }

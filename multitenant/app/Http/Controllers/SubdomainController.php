@@ -66,7 +66,12 @@ class SubdomainController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $tenant = \App\Models\Tenant::findOrFail($id);
+
+        $tenant->disabled = !$tenant->disabled;
+        $tenant->save();
+
+        return back()->with('success', 'Tenant status updated successfully.');
     }
 
     /**
@@ -115,6 +120,7 @@ class SubdomainController extends Controller
 
         return back()->with('success', 'Tenant approved and database created.');
     }
+
 }
 
 

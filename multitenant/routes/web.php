@@ -15,7 +15,7 @@ foreach (config('tenancy.central_domains') as $domain) {
         Route::get('/subdomain-requests', [SubdomainController::class, 'index'])->name('subdomain.index');
         Route::post('/subdomain/approve/{id}', [SubdomainController::class, 'approve'])->name('subdomain.approve');
         Route::post('subdomain', [SubdomainController::class,'store'])->name('subdomain.store');
-        
+        Route::put('/subdomain/{id}', [SubdomainController::class, 'update'])->name('subdomain.update');
 
         Route::domain('tenant.localhost')->middleware(['auth'])->group(function () {
             Route::get('/admin/dashboard', [AdminController::class, 'index'])->name('tenant.admin.dashboard');
