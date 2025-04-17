@@ -17,5 +17,6 @@ class Tenant extends BaseTenant implements TenantWithDatabase
         return $this->hasMany(Admin::class); 
     }
 
+    protected $table = 'tenants';
     
 }

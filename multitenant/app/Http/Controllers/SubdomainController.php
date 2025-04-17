@@ -83,7 +83,31 @@ class SubdomainController extends Controller
      */
     public function destroy(string $id)
     {
-       
+        $tenant = Tenant::where('id', $id)->first();
+
+        if(!$tenant){
+            return back()->with('error', "Tenant ID with {$id} does not exist");
+        }
+
+        try{
+
+            $dbName = $tenant->database()->getName();
+
+            tenancy()->initialize($tenant);
+            tenancy()->end();
+
+            $tenant->domains()->delete();
+            
+            $tenant->delete();
+
+            DB::statement("DROP DATABASE IF EXISTS $dbName");
+
+            TenantRequest::where('subdomain', $tenant->id)->delete();
+
+        }catch(\Exception $e){
+            return redirect()->route('subdomain.index')->with('error', 'An error occured while deleting the tenant.');
+        }
+        return redirect()->route('subdomain.index')->with('success', 'Tenant deleted successfully.');
     }
     
 
