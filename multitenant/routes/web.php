@@ -18,8 +18,9 @@ foreach (config('tenancy.central_domains') as $domain) {
         Route::put('/subdomain/{id}', [SubdomainController::class, 'update'])->name('subdomain.update');
         Route::delete('/subdomain/{id}', [SubdomainController::class, 'destroy'])->name('subdomain.destroy');
 
-        Route::get('/subdomain/{subdomain}/plan', [SubdomainController::class, 'showPlan'])->name('subdomain.plan');
-        Route::post('/tenants/{subdomain}/upgrade', [SubdomainController::class, 'upgradePlan'])->name('subdomain.upgrade');
+
+        Route::post('subdomain/{id}/upgrade', [SubdomainController::class, 'upgradePlan'])->name('subdomain.upgradePlan');
+
 
         Route::domain('tenant.localhost')->middleware(['auth'])->group(function () {
             Route::get('/admin/dashboard', [AdminController::class, 'index'])->name('tenant.admin.dashboard');

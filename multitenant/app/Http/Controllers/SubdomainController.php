@@ -13,6 +13,7 @@ use App\Mail\AdminPasswordMail;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Models\Plan;
+use Illuminate\Support\Facades\Artisan;
 
 
 class SubdomainController extends Controller
@@ -44,6 +45,8 @@ class SubdomainController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'subdomain' => $request->subdomain,
+            'plan' => $request->plan ?? 'free',
+
         ]);
     
         return back()->with('success', 'Your request has been submitted and is pending approval.');
@@ -119,16 +122,28 @@ class SubdomainController extends Controller
             return back()->with('info', 'Already approved.');
         }
 
-        $password = 'password';
+        $password = 'password'; //if random just change the 'password' to 'Str::random(12)'
+
+        $plan = Plan::where('name', 'free')->first();
+
+        if (!$plan) {
+            return back()->with('error', 'Requested plan not available.');
+        }
 
         // Create the actual tenant
         $tenant = Tenant::create([
             'id' => $request->subdomain, 
-            'tenancy_db_name' => 'tenant' . Str::ucfirst($request->subdomain)]);
+            'tenancy_db_name' => 'tenant' . Str::ucfirst($request->subdomain), 
+            'plan_id' =>  $plan->id,
+        ]);
+
         $tenant->domains()->create(['domain' => $request->subdomain . '.localhost']);
+
 
         // Initialize tenant's database
         tenancy()->initialize($tenant);
+
+        Artisan::call('tenants:migrate', ['--tenants' => [$tenant->id], '--force' => true]);
 
         // Create the admin user for the tenant
         $admin = \App\Models\User::create([
@@ -152,64 +167,24 @@ class SubdomainController extends Controller
         return back()->with('success', 'Tenant approved and database created.');
     }
 
-    public function showPlan($subdomain)
-    {
-        $tenantRequest = TenantRequest::where('subdomain', $subdomain)->firstOrFail();
-        $tenant = $tenantRequest->tenant;
-        $plans = Plan::all();
-    
-        return view('central.plan', compact('tenant', 'plans', 'subdomain'));
-    }
 
-    public function upgradePlan($subdomain, Request $request)
+    public function upgradePlan(Request $request, $id)
     {
-        // Get the tenant request by subdomain
-        $tenantRequest = TenantRequest::where('subdomain', $subdomain)->first();
-        
-        if (!$tenantRequest) {
-            return redirect()->back()->with('error', 'Tenant request not found.');
+        $tenant = Tenant::where('id', $id)->firstOrFail();
+    
+        $plan = Plan::find($request->plan_id);
+    
+        if (!$plan) {
+            return back()->with('error', 'Selected plan not found.');
         }
     
-        $tenant = $tenantRequest->tenant;
-        
-        if (!$tenant) {
-            Log::warning("No Tenant associated with subdomain: $subdomain");
-            return redirect()->back()->with('error', 'Tenant not linked to request.');
-        }
+        $tenant->plan_id = $plan->id;
+        $tenant->save();
     
-        // Validate the plan_id from the request
-        $request->validate([
-            'plan_id' => 'required|exists:plans,id',
-        ]);
-    
-        $plan = Plan::findOrFail($request->plan_id);
-    
-        // Check if the plan is already applied
-        if ($tenant->plan_id == $plan->id) {
-            return redirect()->route('subdomain.plan', ['subdomain' => $subdomain])
-                             ->with('info', 'The selected plan is already applied.');
-        }
-    
-        // Log before updating the plan
-        Log::info('Before plan update:', ['tenant_id' => $tenant->id, 'current_plan' => $tenant->plan_id, 'new_plan' => $plan->id]);
-    
-        
-        $updated = $tenant->update(['plan_id' => $plan->id]);
-
-        if ($updated) {
-            Log::info('Plan successfully updated', ['tenant_id' => $tenant->id, 'plan_id' => $plan->id]);
-        } else {
-            Log::error('Failed to update the plan', ['tenant_id' => $tenant->id, 'plan_id' => $plan->id]);
-        }
-    
-        // Log after updating the plan
-        Log::info('After plan update:', ['tenant_id' => $tenant->id, 'new_plan' => $tenant->plan_id]);
-    
-        // Redirect to the dashboard with a success message
-        return redirect()->route('dashboard', ['subdomain' => $subdomain])
-                         ->with('success', 'Your plan has been successfully updated!');
+        return back()->with('success', 'Plan upgraded successfully!');
     }
     
+
     
 }
 

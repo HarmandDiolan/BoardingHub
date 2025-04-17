@@ -8,7 +8,7 @@ use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
 use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
 use App\Http\Controllers\TenantLoginController;
 use App\Http\Controllers\AdminController;
-
+use App\Http\Controllers\Tenant\RoomController;
 /*
 |--------------------------------------------------------------------------
 | Tenant Routes
@@ -44,5 +44,7 @@ Route::middleware([
 
     Route::get('users/create', [UserController::class, 'create'])->name('users.create');
     Route::post('users', [UserController::class, 'store'])->name('users.store');
+
+    Route::get('admin/room', [RoomController::class, 'index'])->name('rooms.index');
 
 });

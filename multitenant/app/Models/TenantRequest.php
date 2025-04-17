@@ -16,4 +16,6 @@ class TenantRequest extends Model
         return $this->hasOne(Tenant::class, 'id', 'subdomain', 'subdomain');
     }
 
+    
+
 }

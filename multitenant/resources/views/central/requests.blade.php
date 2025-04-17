@@ -24,6 +24,7 @@
                     <th>Email</th>
                     <th>Domain</th>
                     <th>Status</th>
+                    <th>Plan</th>
                     <th>Action</th>
                 </tr>
             </thead>
@@ -34,6 +35,7 @@
                         <td>{{ $request->email }}</td>
                         <td>{{ $request->subdomain . '.localhost' }}</td>
                         <td>{{ ucfirst($request->status) }}</td>
+                        <td>{{ ucfirst($request->plan)}}</td>
                         <td>
                             <div class="d-flex gap-2">
                                 @if($request->status !== 'approved')
@@ -44,10 +46,13 @@
                                     </button>
                                 </form>
                                 @endif
-
-                                <a href="{{ route('subdomain.plan', $request->subdomain) }}" title="Upgrade Plan">
-                                    <i class="fa fa-credit-card text-primary"></i>
-                                </a>
+                                <form action="{{ route('subdomain.upgradePlan', $request->id) }}" method="POST">
+                                    @csrf
+                                    <input type="hidden" name="plan_id" value="2"> 
+                                    <button type="submit" style="border: none; background: transparent;" title="Upgrade Plan">
+                                        <i class="fa fa-credit-card text-primary"></i>
+                                    </button>
+                                </form>
                                 <form action="{{ route('subdomain.destroy', $request->subdomain) }}" method="POST">
                                     @csrf
                                     @method('DELETE')

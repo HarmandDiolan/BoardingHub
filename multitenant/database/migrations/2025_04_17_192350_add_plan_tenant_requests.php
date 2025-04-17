@@ -9,20 +9,17 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up(): void
+    public function up()
     {
-        Schema::table('tenants', function (Blueprint $table) {
-            $table->foreignId('plan_id')->nullable()->constrained('plan');
+        Schema::table('tenant_requests', function (Blueprint $table) {
+            $table->string('plan')->default('free');
         });
     }
-
     /**
      * Reverse the migrations.
      */
     public function down(): void
     {
-        Schema::table('tenants', function (Blueprint $table) {
-            //
-        });
+        //
     }
 };
