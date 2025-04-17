@@ -70,7 +70,12 @@ class SubdomainController extends Controller
      */
     public function update(Request $request, string $id)
     {
+        $tenant = Tenant::findOrFail($id);
 
+        $tenant->disabled = !$tenant->disabled;
+        $tenant->save();
+
+        return back()->with('success', 'Tenant status updated successfully.');
     }
 
     /**
@@ -93,7 +98,9 @@ class SubdomainController extends Controller
         $password = 'password';
 
         // Create the actual tenant
-        $tenant = Tenant::create(['id' => $request->subdomain, 'tenancy_db_name' => 'tenant' . Str::ucfirst($request->subdomain)]);
+        $tenant = Tenant::create([
+            'id' => $request->subdomain, 
+            'tenancy_db_name' => 'tenant' . Str::ucfirst($request->subdomain)]);
         $tenant->domains()->create(['domain' => $request->subdomain . '.localhost']);
 
         // Initialize tenant's database

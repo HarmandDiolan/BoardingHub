@@ -55,6 +55,13 @@
                                         <i class="fa fa-close text-danger"></i>
                                     </button>
                                 </form>
+                                <form action="{{ route('subdomain.update', $request->subdomain) }}" method="POST">
+                                    @csrf
+                                    @method('PUT')
+                                    <button type="submit" title="{{ $request->tenant?->disabled ? 'Enable' : 'Disable' }}" style="border: none; background: transparent;">
+                                        <i class="fa {{ $request->tenant?->disabled ? 'fa-unlock text-success' : 'fa-ban text-danger' }}"></i>
+                                    </button>
+                                </form>
                             </div>
                         </td>
                     </tr>
