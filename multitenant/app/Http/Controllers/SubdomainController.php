@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Mail;
 use App\Mail\AdminPasswordMail;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use App\Models\Plan;
 
 
 class SubdomainController extends Controller
@@ -59,22 +60,17 @@ class SubdomainController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit($subdomain)
     {
-        //
-    }
 
+    }
+    
     /**
      * Update the specified resource in storage.
      */
     public function update(Request $request, string $id)
     {
-        $tenant = \App\Models\Tenant::findOrFail($id);
 
-        $tenant->disabled = !$tenant->disabled;
-        $tenant->save();
-
-        return back()->with('success', 'Tenant status updated successfully.');
     }
 
     /**
@@ -82,29 +78,7 @@ class SubdomainController extends Controller
      */
     public function destroy(string $id)
     {
-        $tenant = Tenant::where('id', $id)->first(); 
-    
-        if (!$tenant) {
-            return back()->with('error', "Tenant with ID {$id} does not exist.");
-        }
-        
-        try {
-            $dbName = $tenant->database()->getName();
-    
-            tenancy()->initialize($tenant);
-            tenancy()->end();
-    
-            $tenant->domains()->delete();
-            $tenant->delete();
-    
-            DB::statement("DROP DATABASE IF EXISTS $dbName");
-    
-            TenantRequest::where('subdomain', $tenant->id)->delete();
-    
-        } catch (\Exception $e) {
-            return redirect()->route('subdomain.index')->with('error', 'An error occurred while deleting the tenant.');
-        }
-        return redirect()->route('subdomain.index')->with('success', 'Tenant deleted successfully.');
+       
     }
     
 
@@ -147,6 +121,65 @@ class SubdomainController extends Controller
         return back()->with('success', 'Tenant approved and database created.');
     }
 
+    public function showPlan($subdomain)
+    {
+        $tenantRequest = TenantRequest::where('subdomain', $subdomain)->firstOrFail();
+        $tenant = $tenantRequest->tenant;
+        $plans = Plan::all();
+    
+        return view('central.plan', compact('tenant', 'plans', 'subdomain'));
+    }
+
+    public function upgradePlan($subdomain, Request $request)
+    {
+        // Get the tenant request by subdomain
+        $tenantRequest = TenantRequest::where('subdomain', $subdomain)->first();
+        
+        if (!$tenantRequest) {
+            return redirect()->back()->with('error', 'Tenant request not found.');
+        }
+    
+        $tenant = $tenantRequest->tenant;
+        
+        if (!$tenant) {
+            Log::warning("No Tenant associated with subdomain: $subdomain");
+            return redirect()->back()->with('error', 'Tenant not linked to request.');
+        }
+    
+        // Validate the plan_id from the request
+        $request->validate([
+            'plan_id' => 'required|exists:plans,id',
+        ]);
+    
+        $plan = Plan::findOrFail($request->plan_id);
+    
+        // Check if the plan is already applied
+        if ($tenant->plan_id == $plan->id) {
+            return redirect()->route('subdomain.plan', ['subdomain' => $subdomain])
+                             ->with('info', 'The selected plan is already applied.');
+        }
+    
+        // Log before updating the plan
+        Log::info('Before plan update:', ['tenant_id' => $tenant->id, 'current_plan' => $tenant->plan_id, 'new_plan' => $plan->id]);
+    
+        
+        $updated = $tenant->update(['plan_id' => $plan->id]);
+
+        if ($updated) {
+            Log::info('Plan successfully updated', ['tenant_id' => $tenant->id, 'plan_id' => $plan->id]);
+        } else {
+            Log::error('Failed to update the plan', ['tenant_id' => $tenant->id, 'plan_id' => $plan->id]);
+        }
+    
+        // Log after updating the plan
+        Log::info('After plan update:', ['tenant_id' => $tenant->id, 'new_plan' => $tenant->plan_id]);
+    
+        // Redirect to the dashboard with a success message
+        return redirect()->route('dashboard', ['subdomain' => $subdomain])
+                         ->with('success', 'Your plan has been successfully updated!');
+    }
+    
+    
 }
 
 
