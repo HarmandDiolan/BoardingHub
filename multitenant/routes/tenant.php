@@ -9,6 +9,11 @@ use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
 use App\Http\Controllers\TenantLoginController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Tenant\RoomController;
+use App\Http\Controllers\Tenant\Auth\TenantAuthController;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
+
 /*
 |--------------------------------------------------------------------------
 | Tenant Routes
@@ -25,6 +30,45 @@ Route::middleware([
     InitializeTenancyByDomain::class,
     PreventAccessFromCentralDomains::class,
 ])->group(function () {
+    // Debug route
+    Route::get('/debug-db', function () {
+        try {
+            $dbName = DB::connection()->getDatabaseName();
+            $tables = DB::select('SHOW TABLES');
+            $roomsTable = Schema::hasTable('rooms');
+            
+            $debugInfo = [
+                'database' => $dbName,
+                'tables' => $tables,
+                'has_rooms_table' => $roomsTable,
+                'tenant' => tenant()->toArray(),
+            ];
+            
+            Log::info('Database debug info:', $debugInfo);
+            
+            return response()->json($debugInfo);
+        } catch (\Exception $e) {
+            Log::error('Database debug error:', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    });
+
+    // Test route to check tenant context
+    Route::get('/test-tenant', function () {
+        $debugInfo = [
+            'tenant' => tenant() ? tenant()->toArray() : null,
+            'current_domain' => request()->getHost(),
+        ];
+        
+        Log::info('Test tenant route debug info:', $debugInfo);
+        
+        return response()->json($debugInfo);
+    });
+
+    // Public routes
     Route::get('/', function () {
         return tenant();
     });
@@ -33,18 +77,48 @@ Route::middleware([
         return 'Tenant ID: ' . optional(tenant())->id;
     });
 
-    Route::get('tenant-login', [TenantLoginController::class, 'showLoginForm'])->name('tenant.login');
-    Route::post('tenant-login', [TenantLoginController::class, 'login'])->name('tenant.login.submit');
-    Route::get('tenant-login', [TenantLoginController::class, 'showLoginForm'])->name('tenant.login');
+    // Authentication routes
+    Route::get('/register', [TenantAuthController::class, 'showRegistrationForm'])->name('tenant.register');
+    Route::post('/register', [TenantAuthController::class, 'register']);
+    Route::get('/tenant-login', [TenantAuthController::class, 'showLoginForm'])->name('tenant.login');
+    Route::post('/tenant-login', [TenantAuthController::class, 'login']);
+    Route::post('/tenant-logout', [TenantAuthController::class, 'logout'])->name('tenant.logout');
 
-    Route::get('/admin/dashboard', [AdminController::class, 'index'])->name('tenant.admin.dashboard');
+    // Protected routes
+    Route::middleware(['auth'])->group(function () {
+        // Dashboard
+        Route::get('/dashboard', [AdminController::class, 'index'])->name('tenant.dashboard');
+        Route::get('/admin/dashboard', [AdminController::class, 'index'])->name('tenant.admin.dashboard');
+        
+        // Room management
+        Route::get('/admin/rooms', [RoomController::class, 'index'])->name('tenant.admin.room');
+        Route::get('/admin/rooms/create', [RoomController::class, 'create'])->name('tenant.admin.room.create');
+        Route::post('/admin/rooms', [RoomController::class, 'store'])->name('tenant.admin.room.store');
+        Route::get('/admin/rooms/{id}/edit', [RoomController::class, 'edit'])->name('tenant.admin.room.edit');
+        Route::put('/admin/rooms/{id}', [RoomController::class, 'update'])->name('tenant.admin.room.update');
+        Route::delete('/admin/rooms/{id}', [RoomController::class, 'destroy'])->name('tenant.admin.room.destroy');
+        
+        // User management
+        Route::get('users/create', [UserController::class, 'create'])->name('users.create');
+        Route::post('users', [UserController::class, 'store'])->name('users.store');
+    });
 
-    Route::get('tenant/register', [TenantLoginController::class, 'showRegisterForm'])->name('tenant.register.form');
-    Route::post('tenant/register', [TenantLoginController::class, 'TenantRegister'])->name('tenant.register');
-
-    Route::get('users/create', [UserController::class, 'create'])->name('users.create');
-    Route::post('users', [UserController::class, 'store'])->name('users.store');
-
-    Route::get('admin/room', [RoomController::class, 'index'])->name('rooms.index');
-
+    // Debug route
+    Route::get('/debug-auth', function () {
+        $user = auth()->user();
+        $debugInfo = [
+            'is_authenticated' => auth()->check(),
+            'user' => $user ? [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'role' => $user->role,
+            ] : null,
+            'tenant' => tenant() ? tenant()->toArray() : null,
+        ];
+        
+        Log::info('Auth debug info:', $debugInfo);
+        
+        return response()->json($debugInfo);
+    });
 });

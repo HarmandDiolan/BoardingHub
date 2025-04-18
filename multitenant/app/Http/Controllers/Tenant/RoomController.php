@@ -7,16 +7,44 @@ use App\Http\Requests\Tenant\StoreRoomRequest;
 use App\Http\Requests\Tenant\UpdateRoomRequest;
 use Illuminate\Http\Request;
 use App\Models\Tenant\Room;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use App\Policies\Tenant\RoomPolicy;
+use Stancl\Tenancy\Tenancy;
+use Stancl\Tenancy\Contracts\Tenant;
+use Illuminate\Support\Facades\DB;
 
 class RoomController extends Controller
 {
+    protected $tenancy;
+
+    public function __construct(Tenancy $tenancy)
+    {
+        $this->tenancy = $tenancy;
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $rooms = Room::all();
-        return view('admin.rooms.room', compact('rooms'));
+        // Debug tenant database connection
+        try {
+            $dbName = DB::connection()->getDatabaseName();
+            Log::info('Current database:', ['database' => $dbName]);
+            
+            $rooms = Room::all();
+            Log::info('Rooms count:', ['count' => $rooms->count()]);
+            
+            return view('tenant.admin.room', compact('rooms'));
+        } catch (\Exception $e) {
+            Log::error('Database error:', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            return back()->with('error', 'Database error: ' . $e->getMessage());
+        }
     }
 
     /**
@@ -24,7 +52,7 @@ class RoomController extends Controller
      */
     public function create()
     {
-        return view('rooms.create');
+        return view('tenant.admin.room.create');
     }
 
     /**
@@ -32,9 +60,64 @@ class RoomController extends Controller
      */
     public function store(StoreRoomRequest $request)
     {
-        Room::create($request->all());
+        try {
+            // Debug tenant database connection
+            $dbName = DB::connection()->getDatabaseName();
+            Log::info('Current database:', ['database' => $dbName]);
 
-        return redirect()->route('rooms.index')->with('success', 'Room created');
+            // Debug the request data
+            Log::info('Store Room Request:', [
+                'request_data' => $request->all(),
+                'tenant' => tenant()->toArray(),
+                'database' => $dbName
+            ]);
+
+            // Start a database transaction
+            DB::beginTransaction();
+
+            try {
+                // Create the room
+                $room = new Room([
+                    'room_number' => $request->room_number,
+                    'capacity' => $request->capacity,
+                    'price' => $request->price,
+                    'status' => $request->status ?? 'available',
+                ]);
+
+                // Log before save
+                Log::info('Attempting to save room:', ['room' => $room->toArray()]);
+
+                // Save the room
+                $saved = $room->save();
+
+                // Log after save
+                Log::info('Room save result:', [
+                    'saved' => $saved,
+                    'room_id' => $room->id,
+                    'room' => $room->toArray()
+                ]);
+
+                // Commit the transaction
+                DB::commit();
+
+                return redirect()->route('tenant.admin.room')->with('success', 'Room created successfully');
+            } catch (\Exception $e) {
+                // Rollback the transaction on error
+                DB::rollBack();
+                Log::error('Database error during room creation:', [
+                    'error' => $e->getMessage(),
+                    'sql' => $e->getPrevious() ? $e->getPrevious()->getMessage() : null,
+                    'trace' => $e->getTraceAsString()
+                ]);
+                throw $e;
+            }
+        } catch (\Exception $e) {
+            Log::error('Error creating room:', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            return back()->with('error', 'Failed to create room: ' . $e->getMessage());
+        }
     }
 
     /**
@@ -43,8 +126,7 @@ class RoomController extends Controller
     public function show(string $id)
     {
         $room = Room::findOrFail($id);
-        
-        return view('rooms.show', compact('room'));
+        return view('tenant.admin.room.show', compact('room'));
     }
 
     /**
@@ -53,8 +135,7 @@ class RoomController extends Controller
     public function edit(string $id)
     {
         $room = Room::findOrFail($id);
-
-        return view('rooms.edit', compact('room'));
+        return view('tenant.admin.room.edit', compact('room'));
     }
 
     /**
@@ -64,8 +145,7 @@ class RoomController extends Controller
     {
         $room = Room::findOrFail($id);
         $room->update($request->validated());
-
-        return redirect()->route('rooms.index')->with('success', 'Room updated successfully.');
+        return redirect()->route('tenant.admin.room')->with('success', 'Room updated successfully.');
     }
 
     /**
@@ -75,8 +155,7 @@ class RoomController extends Controller
     {
         $room = Room::findOrFail($id);
         $room->delete();
-
-        return redirect()->route('rooms.index')->with('success', 'Room has been deleted');
-
+        return redirect()->route('tenant.admin.room')->with('success', 'Room has been deleted');
     }
 }
+

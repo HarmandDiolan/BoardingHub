@@ -11,7 +11,7 @@ class StoreRoomRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return auth()->check() && auth()->user()->role === 'admin';
     }
 
     /**
@@ -22,7 +22,10 @@ class StoreRoomRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'room_number' => 'required|string|max:255|unique:rooms',
+            'capacity' => 'required|integer|min:1',
+            'price' => 'required|numeric|min:0',
+            'status' => 'required|in:available,occupied,maintenance'
         ];
     }
 }

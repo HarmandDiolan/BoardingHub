@@ -16,7 +16,5 @@ class AdminController extends Controller
             // Pass the user data to the view
             return view('tenant.admin.dashboard', compact('user'));
         }
-
-        // If the user is not authenticated, redirect to the login page
     }
 }
