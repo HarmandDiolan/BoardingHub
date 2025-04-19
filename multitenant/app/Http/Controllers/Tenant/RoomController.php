@@ -14,6 +14,7 @@ use App\Policies\Tenant\RoomPolicy;
 use Stancl\Tenancy\Tenancy;
 use Stancl\Tenancy\Contracts\Tenant;
 use Illuminate\Support\Facades\DB;
+use App\Models\User; 
 
 class RoomController extends Controller
 {
@@ -156,6 +157,17 @@ class RoomController extends Controller
         $room = Room::findOrFail($id);
         $room->delete();
         return redirect()->route('tenant.admin.room')->with('success', 'Room has been deleted');
+    }
+
+    public function showOccupant($roomId){
+        $room = Room::findOrFail($roomId);
+
+        if($room->status === 'occupied'){
+            $occupant = User::find($room->rented_by);
+        } else {
+            $occupant = null;
+        }
+        return view ('tenant.admin.room.showOccupant', compact('room', 'occupant'));
     }
 }
 

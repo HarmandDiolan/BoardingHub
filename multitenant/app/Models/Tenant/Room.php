@@ -4,6 +4,7 @@ namespace App\Models\Tenant;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\User;
 
 class Room extends Model
 {
@@ -14,7 +15,14 @@ class Room extends Model
         'capacity',
         'price',
         'status',
+        'rented_by',
+        
     ];
 
     protected $connection = 'tenant';
+
+    public function occupant()
+    {
+        return $this->belongsTo(User::class, 'rented_by');
+    }
 }

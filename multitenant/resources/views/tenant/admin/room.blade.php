@@ -57,6 +57,9 @@
                                         <a href="{{ route('tenant.admin.room.edit', $room->id) }}" class="btn btn-sm btn-info">
                                             <i class="fas fa-edit"></i>
                                         </a>
+                                        <a href="{{ route('tenant.admin.room.showOccupant', $room->id) }}" class="btn btn-sm btn-secondary">
+                                            <i class="fas fa-eye"></i> 
+                                        </a>
                                         <form action="{{ route('tenant.admin.room.destroy', $room->id) }}" method="POST" style="display: inline;">
                                             @csrf
                                             @method('DELETE')

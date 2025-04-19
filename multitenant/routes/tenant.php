@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use App\Http\Controllers\Tenant\ComplaintController;
+use App\Http\Controllers\Tenant\UserRoomController;
 
 /*
 |--------------------------------------------------------------------------
@@ -97,7 +98,10 @@ Route::middleware([
         Route::post('/complaints', [ComplaintController::class, 'store'])->name('tenant.user.complaints.store');
 
         Route::get('/admin/complaints', [ComplaintController::class, 'index'])->name('tenant.admin.complaints.index');
+        Route::get('/user/rooms', [UserRoomController::class, 'index'])->name('tenant.user.rooms.index');
+        Route::post('/user/rooms/rent/{id}', [UserRoomController::class, 'rent'])->name('tenant.user.rooms.rent');
 
+        
         // Room management
         Route::prefix('admin/rooms')->group(function () {
             Route::get('/', [RoomController::class, 'index'])->name('tenant.admin.room');
@@ -106,6 +110,8 @@ Route::middleware([
             Route::get('/{id}/edit', [RoomController::class, 'edit'])->name('tenant.admin.room.edit');
             Route::put('/{id}', [RoomController::class, 'update'])->name('tenant.admin.room.update');
             Route::delete('/{id}', [RoomController::class, 'destroy'])->name('tenant.admin.room.destroy');
+            Route::get('/admin/rooms/{roomId}/occupant', [RoomController::class, 'showOccupant'])->name('tenant.admin.room.showOccupant');
+
         });
         
         // User management

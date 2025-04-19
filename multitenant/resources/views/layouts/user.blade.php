@@ -81,7 +81,10 @@
     </a>
 
     <a href="{{ route('tenant.user.complaints.create') }}" class="{{ request()->routeIs('tenant.user.complaints.create') ? 'active' : '' }}">
-        <i class="fas fa-door-open me-2"></i> Complaint
+        <i class="fas fa-message me-2"></i> Complaint
+    </a>
+    <a href="{{ route('tenant.user.rooms.index') }}" class="{{ request()->routeIs('tenant.user.rooms.index') ? 'active' : '' }}">
+        <i class="fas fa-door-open me-2"></i> Room
     </a>
 
     <form method="POST" action="{{ route('tenant.logout') }}" class="mt-auto">
