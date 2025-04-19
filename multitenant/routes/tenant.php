@@ -13,6 +13,7 @@ use App\Http\Controllers\Tenant\Auth\TenantAuthController;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use App\Http\Controllers\Tenant\ComplaintController;
 
 /*
 |--------------------------------------------------------------------------
@@ -91,6 +92,11 @@ Route::middleware([
         Route::get('/dashboard', [AdminController::class, 'index'])->name('tenant.dashboard');
         Route::get('/admin/dashboard', [AdminController::class, 'index'])->name('tenant.admin.dashboard');
         Route::get('/user/dashboard', [TenantLoginController::class, 'showUserDashboard'])->name('tenant.user.userDashboard');
+
+        Route::get('/complaints/create', [ComplaintController::class, 'create'])->name('tenant.user.complaints.create');
+        Route::post('/complaints', [ComplaintController::class, 'store'])->name('tenant.user.complaints.store');
+
+        Route::get('/admin/complaints', [ComplaintController::class, 'index'])->name('tenant.admin.complaints.index');
 
         // Room management
         Route::prefix('admin/rooms')->group(function () {

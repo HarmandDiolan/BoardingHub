@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'Admin Dashboard')</title>
+    <title>@yield('title', Dashboard')</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     @stack('styles')
@@ -67,7 +67,7 @@
 <!-- Topbar -->
 <nav class="navbar navbar-expand navbar-dark bg-dark fixed-top">
     <div class="container-fluid">
-        <a class="navbar-brand" href="{{ route('tenant.admin.dashboard') }}">Admin Dashboard</a>
+        <a class="navbar-brand" href="{{ route('tenant.admin.dashboard') }}">Dashboard</a>
         <div class="d-flex align-items-center">
             <span class="text-light me-3">Welcome, {{ Auth::user()->name }}</span>
         </div>
@@ -76,16 +76,14 @@
 
 <!-- Sidebar -->
 <div class="sidebar">
-    <a href="{{ route('tenant.admin.dashboard') }}" class="{{ request()->routeIs('tenant.admin.dashboard') ? 'active' : '' }}">
+    <a href="{{ route('tenant.user.userDashboard') }}" class="{{ request()->routeIs('tenant.user.userDashboard') ? 'active' : '' }}">
         <i class="fas fa-tachometer-alt me-2"></i> Dashboard
     </a>
-    <a href="{{ route('tenant.admin.room') }}" class="{{ request()->routeIs('tenant.admin.room*') ? 'active' : '' }}">
-        <i class="fas fa-door-open me-2"></i> Rooms
-    </a>
-    <a href="{{ route('tenant.admin.complaints.index') }}" class="{{ request()->routeIs('tenant.admin.complaints.index*') ? 'active' : '' }}">
+
+    <a href="{{ route('tenant.user.complaints.create') }}" class="{{ request()->routeIs('tenant.user.complaints.create') ? 'active' : '' }}">
         <i class="fas fa-door-open me-2"></i> Complaint
     </a>
-    
+
     <form method="POST" action="{{ route('tenant.logout') }}" class="mt-auto">
         @csrf
         <button type="submit" class="logout-btn">
@@ -96,7 +94,7 @@
 
 <!-- Page Content -->
 <div class="content">
-    @yield('content')
+    @yield('user')
 </div>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
