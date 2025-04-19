@@ -32,11 +32,16 @@ class TenantLoginController extends Controller
     
         Auth::login($user);
     
-        return match($user->role) {
-            'admin' => redirect()->route('tenant.admin.dashboard'),
-            'employee' => redirect()->route('employee.dashboard'),
-            'user' => redirect()->route('tenant.user.userDashboard'),
-        };
+        // Check if the user is already logged in and redirect accordingly
+        if ($user->role === 'admin') {
+            return redirect()->route('tenant.admin.dashboard');
+        } elseif ($user->role === 'employee') {
+            return redirect()->route('employee.dashboard');
+        } elseif ($user->role === 'user') {
+            return redirect()->route('tenant.users.userDashboard');
+        }
+    
+        return redirect()->route('tenant.dashboard');  // Fallback route
     }
 
     public function logout(Request $request)
@@ -74,7 +79,7 @@ class TenantLoginController extends Controller
 
             Auth::login($user);
 
-            return redirect()->route('tenant.user.dashboard')->with('success', 'Tenant registered successfully!');
+            return redirect()->route('tenant.users.userDashboard')->with('success', 'Tenant registered successfully!');
         } catch (\Exception $e) {
             DB::rollBack();
 
@@ -85,7 +90,13 @@ class TenantLoginController extends Controller
 
     public function showRegisterForm()
     {
-        return view('tenant.registertenant');  // Return the registration view
+        return view('tenant.registertenant');  
+    }
+
+    public function showUserDashboard()
+    {
+        $user = Auth::user();
+        return view('tenant.user.userDashboard');  
     }
 }
 

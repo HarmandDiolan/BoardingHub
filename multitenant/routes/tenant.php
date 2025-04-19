@@ -90,7 +90,8 @@ Route::middleware([
         // Dashboard
         Route::get('/dashboard', [AdminController::class, 'index'])->name('tenant.dashboard');
         Route::get('/admin/dashboard', [AdminController::class, 'index'])->name('tenant.admin.dashboard');
-        
+        Route::get('/user/dashboard', [TenantLoginController::class, 'showUserDashboard'])->name('tenant.user.userDashboard');
+
         // Room management
         Route::prefix('admin/rooms')->group(function () {
             Route::get('/', [RoomController::class, 'index'])->name('tenant.admin.room');

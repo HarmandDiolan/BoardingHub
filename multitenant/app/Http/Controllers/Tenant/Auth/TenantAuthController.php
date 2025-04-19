@@ -47,13 +47,20 @@ class TenantAuthController extends Controller
             'email' => ['required', 'email'],
             'password' => ['required'],
         ]);
-
+    
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
             $request->session()->regenerate();
-
-            return redirect()->intended(route('tenant.dashboard'));
+    
+            $user = Auth::user();
+    
+            return match ($user->role) {
+                'admin' => redirect()->route('tenant.admin.dashboard'),
+                'employee' => redirect()->route('employee.dashboard'),
+                'user' => redirect()->route('tenant.user.userDashboard'),
+                default => abort(403, 'Unauthorized'),
+            };
         }
-
+    
         return back()->withErrors([
             'email' => 'The provided credentials do not match our records.',
         ])->onlyInput('email');

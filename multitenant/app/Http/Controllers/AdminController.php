@@ -17,4 +17,5 @@ class AdminController extends Controller
             return view('tenant.admin.dashboard', compact('user'));
         }
     }
+
 }
