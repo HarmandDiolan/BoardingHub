@@ -78,11 +78,12 @@ Route::middleware([
     });
 
     // Authentication routes
-    Route::get('/register', [TenantAuthController::class, 'showRegistrationForm'])->name('tenant.register');
-    Route::post('/register', [TenantAuthController::class, 'register']);
+    Route::get('tenant/register', [TenantLoginController::class, 'showRegisterForm'])->name('tenant.register.form');
+    Route::post('tenant/register', [TenantLoginController::class, 'TenantRegister'])->name('tenant.register');
     Route::get('/tenant-login', [TenantAuthController::class, 'showLoginForm'])->name('tenant.login');
     Route::post('/tenant-login', [TenantAuthController::class, 'login']);
     Route::post('/tenant-logout', [TenantAuthController::class, 'logout'])->name('tenant.logout');
+
 
     // Protected routes
     Route::middleware(['auth'])->group(function () {

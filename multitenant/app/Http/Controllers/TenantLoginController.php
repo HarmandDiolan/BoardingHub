@@ -35,7 +35,7 @@ class TenantLoginController extends Controller
         return match($user->role) {
             'admin' => redirect()->route('tenant.admin.dashboard'),
             'employee' => redirect()->route('employee.dashboard'),
-            default => redirect()->route('tenant.dashboard'),
+            'user' => redirect()->route('tenant.user.userDashboard'),
         };
     }
 
@@ -50,38 +50,38 @@ class TenantLoginController extends Controller
 
     public function TenantRegister(Request $request)
     {
-        // Validate the incoming request
-            $request->validate([
-                'email' => 'required|email|unique:users,email', 
-                'password' => 'required|string|min:8|confirmed', 
+        if (!tenant()) {
+            return redirect()->back()->withErrors(['error' => 'Tenant not identified.']);
+        }
+
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required|string|min:8|confirmed',
+        ]);
+
+        DB::beginTransaction();
+
+        try {
+            $user = User::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+                'role' => 'user',
             ]);
 
-            DB::beginTransaction();
+            DB::commit();
 
-            try {
-                // Create a new tenant record
-                $tenant = Tenant::create([
-                    'tenancy_db_name' => 'tenant_' . $request->subdomain,
-                ]);
+            Auth::login($user);
 
-                $user = User::create([
-                    'name' => $request->name,
-                    'email' => $request->email,
-                    'password' => Hash::make($request->password),
-                    'role' => 'admin', 
-                ]);
+            return redirect()->route('tenant.user.dashboard')->with('success', 'Tenant registered successfully!');
+        } catch (\Exception $e) {
+            DB::rollBack();
 
-                DB::commit();
-
-                Auth::login($user);
-
-                return redirect()->route('tenant.admin.dashboard')->with('success', 'Tenant registered successfully!');
-            } catch (\Exception $e) {
-                DB::rollBack();
-
-                return redirect()->back()->withErrors(['error' => 'An error occurred while registering the tenant.']);
-            }
+            return redirect()->back()->withErrors(['error' => 'An error occurred while registering the tenant.']);
+        }
     }
+
 
     public function showRegisterForm()
     {
