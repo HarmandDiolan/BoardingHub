@@ -16,7 +16,7 @@ class Room extends Model
         'price',
         'status',
         'rented_by',
-        
+
     ];
 
     protected $connection = 'tenant';

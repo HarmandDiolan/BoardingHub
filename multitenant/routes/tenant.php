@@ -111,6 +111,10 @@ Route::middleware([
             Route::put('/{id}', [RoomController::class, 'update'])->name('tenant.admin.room.update');
             Route::delete('/{id}', [RoomController::class, 'destroy'])->name('tenant.admin.room.destroy');
             Route::get('/admin/rooms/{roomId}/occupant', [RoomController::class, 'showOccupant'])->name('tenant.admin.room.showOccupant');
+            
+            Route::get('/rentals', [RoomController::class, 'rentalIndex'])->name('tenant.admin.rent.rentalIndex');
+            Route::post('/rentals/{id}/mark-paid', [RoomController::class, 'markAsPaid'])->name('tenant.admin.rent.markAsPaid');
+
 
         });
         

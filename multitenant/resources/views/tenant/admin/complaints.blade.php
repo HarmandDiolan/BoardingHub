@@ -63,7 +63,10 @@
 
 <script>
     $(document).ready(function() {
-        $('#complaintsTable').DataTable();
+        $('#rentalsTable').DataTable({
+            "paging": true, 
+            "searching": true 
+        });
     });
 </script>
 

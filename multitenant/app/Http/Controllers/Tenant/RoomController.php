@@ -15,6 +15,7 @@ use Stancl\Tenancy\Tenancy;
 use Stancl\Tenancy\Contracts\Tenant;
 use Illuminate\Support\Facades\DB;
 use App\Models\User; 
+use App\Models\Tenant\RoomRental;
 
 class RoomController extends Controller
 {
@@ -168,6 +169,20 @@ class RoomController extends Controller
             $occupant = null;
         }
         return view ('tenant.admin.room.showOccupant', compact('room', 'occupant'));
+    }
+
+    public function rentalIndex(){
+        $rentals = RoomRental::with(['user', 'room'])->latest()->get();
+        return view('tenant.admin.rent', compact('rentals'));
+    }
+
+    public function markAsPaid($id){
+        $rental = RoomRental::findOrFail($id);
+        $rental->payment_status = 'paid';
+        $rental->save();
+
+        return back()->with('success', 'Marked as paid');
+
     }
 }
 
