@@ -91,12 +91,14 @@ Route::middleware([
         Route::get('/admin/dashboard', [AdminController::class, 'index'])->name('tenant.admin.dashboard');
         
         // Room management
-        Route::get('/admin/rooms', [RoomController::class, 'index'])->name('tenant.admin.room');
-        Route::get('/admin/rooms/create', [RoomController::class, 'create'])->name('tenant.admin.room.create');
-        Route::post('/admin/rooms', [RoomController::class, 'store'])->name('tenant.admin.room.store');
-        Route::get('/admin/rooms/{id}/edit', [RoomController::class, 'edit'])->name('tenant.admin.room.edit');
-        Route::put('/admin/rooms/{id}', [RoomController::class, 'update'])->name('tenant.admin.room.update');
-        Route::delete('/admin/rooms/{id}', [RoomController::class, 'destroy'])->name('tenant.admin.room.destroy');
+        Route::prefix('admin/rooms')->group(function () {
+            Route::get('/', [RoomController::class, 'index'])->name('tenant.admin.room');
+            Route::get('/create', [RoomController::class, 'create'])->name('tenant.admin.room.create');
+            Route::post('/', [RoomController::class, 'store'])->name('tenant.admin.room.store');
+            Route::get('/{id}/edit', [RoomController::class, 'edit'])->name('tenant.admin.room.edit');
+            Route::put('/{id}', [RoomController::class, 'update'])->name('tenant.admin.room.update');
+            Route::delete('/{id}', [RoomController::class, 'destroy'])->name('tenant.admin.room.destroy');
+        });
         
         // User management
         Route::get('users/create', [UserController::class, 'create'])->name('users.create');
