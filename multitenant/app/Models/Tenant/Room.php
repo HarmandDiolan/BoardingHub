@@ -5,6 +5,7 @@ namespace App\Models\Tenant;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\User;
+use App\Models\Tenant\RoomRental; 
 
 class Room extends Model
 {
@@ -31,5 +32,9 @@ class Room extends Model
         return $this->hasOne(\App\Models\Tenant\Room::class, 'rented_by');
     }
 
+    public function rentRoom()
+    {
+        return $this->hasMany(RoomRental::class, 'room_id'); // Assuming 'room_id' is the foreign key
+    }
     
 }

@@ -48,8 +48,14 @@
                                 <td>{{ $room->capacity }}</td>
                                 <td>₱{{ number_format($room->price, 2) }}</td>
                                 <td>
-                                    <span class="badge bg-{{ $room->status === 'available' ? 'success' : ($room->status === 'occupied' ? 'danger' : 'warning') }}">
-                                        {{ ucfirst($room->status) }}
+                                    @php
+                                        $rentedSpots = $room->rentRoom->count(); // Count how many renters have booked this room
+                                        $capacity = $room->capacity; // Get the room's capacity
+                                        $status = ($rentedSpots == $capacity) ? 'Full' : "{$rentedSpots}/{$capacity}"; // Check if the room is full
+                                    @endphp
+
+                                    <span class="badge bg-{{ $rentedSpots == $capacity ? 'danger' : 'success' }}">
+                                        {{ $status }}
                                     </span>
                                 </td>
                                 <td>
