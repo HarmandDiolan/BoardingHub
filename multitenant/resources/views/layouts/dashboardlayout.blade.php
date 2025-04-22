@@ -50,13 +50,7 @@
             <li class="nav-item active">
                 <a class="nav-link" href="{{ route('subdomain.index') }}">
                     <i class="fas fa-fw fa-tachometer-alt"></i>
-                    <span>Req</span></a>
-            </li>
-
-            <li class="nav-item active">
-                <a class="nav-link" href="{{ route('subdomain.index') }}">
-                    <i class="fas fa-fw fa-tachometer-alt"></i>
-                    <span>Req</span></a>
+                    <span>Tenant</span></a>
             </li>
 
             <!-- Divider -->

@@ -87,11 +87,11 @@
     </a>
 
     <a href="{{ route('tenant.admin.rent.rentalIndex') }}" class="{{ request()->routeIs('tenant.admin.rent.rentalIndex*') ? 'active' : '' }}">
-        <i class="fas fa-comments me-2"></i> Payment
+        <i class="fa-solid fa-money-bill"></i> Payment
     </a>
 
     <a href="{{ route('tenant.admin.users') }}" class="{{ request()->routeIs('tenant.admin.users*') ? 'active' : '' }}">
-        <i class="fas fa-comments me-2"></i> User
+        <i class="fa-solid fa-user"></i> User
     </a>
 
     
