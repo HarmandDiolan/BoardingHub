@@ -16,6 +16,20 @@
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     @endif
+    @if(session('warning'))
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            {{ session('warning') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+    @if(session('info'))
+        <div class="alert alert-info alert-dismissible fade show" role="alert">
+            {{ session('info') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
+    @include('alert.alerts')
 
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1 class="h3 mb-0 text-gray-800">Rooms Management</h1>
@@ -66,13 +80,14 @@
                                         <a href="{{ route('tenant.admin.room.showOccupant', $room->id) }}" class="btn btn-sm btn-secondary">
                                             <i class="fas fa-eye"></i> 
                                         </a>
-                                        <form action="{{ route('tenant.admin.room.destroy', $room->id) }}" method="POST" style="display: inline;">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this room?')">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </form>
+                                        <form id="deleteForm-{{ $room->id }}" action="{{ route('tenant.admin.room.destroy', $room->id) }}" method="POST" style="display: inline;">
+    @csrf
+    @method('DELETE')
+    <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#confirmationModal" onclick="setDeleteFormAction('{{ route('tenant.admin.room.destroy', $room->id) }}')">
+        <i class="fas fa-trash"></i>
+    </button>
+</form>
+
                                     </div>
                                 </td>
                             </tr>
@@ -85,7 +100,7 @@
 </div>
 
 @include('tenant.admin.modal.roomModal')
-
+@include('alert.confirmation')
 <!-- Add DataTables CSS -->
 <link href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css" rel="stylesheet">
 <!-- Add DataTables JS -->
@@ -96,6 +111,12 @@
     $(document).ready(function() {
         $('#roomsTable').DataTable();
     });
+
+    function setDeleteFormAction(actionUrl) {
+    const form = document.getElementById('confirmationForm');
+    form.action = actionUrl;
+}
 </script>
+
 
 @endsection

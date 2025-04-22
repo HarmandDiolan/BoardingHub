@@ -157,7 +157,7 @@ class RoomController extends Controller
     {
         $room = Room::findOrFail($id);
         $room->delete();
-        return redirect()->route('tenant.admin.room')->with('success', 'Room has been deleted');
+        return redirect()->route('tenant.admin.room')->with('confirmation', 'Room deleted successfully.');
     }
 
     public function showOccupant($roomId){
