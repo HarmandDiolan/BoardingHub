@@ -81,13 +81,12 @@
                                             <i class="fas fa-eye"></i> 
                                         </a>
                                         <form id="deleteForm-{{ $room->id }}" action="{{ route('tenant.admin.room.destroy', $room->id) }}" method="POST" style="display: inline;">
-    @csrf
-    @method('DELETE')
-    <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#confirmationModal" onclick="setDeleteFormAction('{{ route('tenant.admin.room.destroy', $room->id) }}')">
-        <i class="fas fa-trash"></i>
-    </button>
-</form>
-
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#confirmationModal" onclick="setDeleteFormAction('{{ route('tenant.admin.room.destroy', $room->id) }}')">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
                                     </div>
                                 </td>
                             </tr>
@@ -112,10 +111,6 @@
         $('#roomsTable').DataTable();
     });
 
-    function setDeleteFormAction(actionUrl) {
-    const form = document.getElementById('confirmationForm');
-    form.action = actionUrl;
-}
 </script>
 
 
