@@ -50,5 +50,15 @@ class User extends Authenticatable
         ];
     }
     
+    public function roomRentals()
+    {
+        return $this->hasMany(\App\Models\Tenant\RoomRental::class, 'rented_by');
+    }
+    
+    public function rentedRoom()
+    {
+        return $this->hasOne(\App\Models\Tenant\Room::class, 'rented_by');
+    }
+    
     
 }

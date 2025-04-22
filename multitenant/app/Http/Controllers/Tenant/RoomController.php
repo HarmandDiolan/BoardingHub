@@ -182,7 +182,7 @@ class RoomController extends Controller
         $rental->save();
 
         return back()->with('success', 'Marked as paid');
-
     }
+
 }
 

@@ -93,6 +93,7 @@ Route::middleware([
         Route::get('/dashboard', [AdminController::class, 'index'])->name('tenant.dashboard');
         Route::get('/admin/dashboard', [AdminController::class, 'index'])->name('tenant.admin.dashboard');
         Route::get('/user/dashboard', [TenantLoginController::class, 'showUserDashboard'])->name('tenant.user.userDashboard');
+        Route::get('/admin/users', [AdminController::class, 'users'])->name('tenant.admin.users');
 
         Route::get('/complaints/create', [ComplaintController::class, 'create'])->name('tenant.user.complaints.create');
         Route::post('/complaints', [ComplaintController::class, 'store'])->name('tenant.user.complaints.store');

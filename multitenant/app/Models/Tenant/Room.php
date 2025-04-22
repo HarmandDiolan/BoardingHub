@@ -25,4 +25,11 @@ class Room extends Model
     {
         return $this->belongsTo(User::class, 'rented_by');
     }
+    
+    public function rentedRoom()
+    {
+        return $this->hasOne(\App\Models\Tenant\Room::class, 'rented_by');
+    }
+
+    
 }

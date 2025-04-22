@@ -44,5 +44,6 @@ class UserRoomController extends Controller
         $room->save();
         return back()->with('success', 'You have successfully rented Room ' . $room->room_number);
     }
+
     
 }

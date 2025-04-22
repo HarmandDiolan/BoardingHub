@@ -27,4 +27,6 @@ class RoomRental extends Model
     {
         return $this->belongsTo(Room::class);
     }
+
+    
 }

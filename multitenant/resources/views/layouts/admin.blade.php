@@ -89,6 +89,11 @@
     <a href="{{ route('tenant.admin.rent.rentalIndex') }}" class="{{ request()->routeIs('tenant.admin.rent.rentalIndex*') ? 'active' : '' }}">
         <i class="fas fa-comments me-2"></i> Payment
     </a>
+
+    <a href="{{ route('tenant.admin.users') }}" class="{{ request()->routeIs('tenant.admin.users*') ? 'active' : '' }}">
+        <i class="fas fa-comments me-2"></i> User
+    </a>
+
     
     <form method="POST" action="{{ route('tenant.logout') }}" class="mt-auto">
         @csrf
