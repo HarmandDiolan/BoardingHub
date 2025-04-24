@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
+use App\Models\Announcement;
 
 class TenantAuthController extends Controller
 {
@@ -75,4 +76,5 @@ class TenantAuthController extends Controller
 
         return redirect('/');
     }
+
 } 

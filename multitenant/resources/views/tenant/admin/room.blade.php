@@ -100,6 +100,7 @@
 
 @include('tenant.admin.modal.roomModal')
 @include('alert.confirmation')
+
 <!-- Add DataTables CSS -->
 <link href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css" rel="stylesheet">
 <!-- Add DataTables JS -->

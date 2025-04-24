@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
+use App\Models\Announcement;
 
 class TenantLoginController extends Controller
 {
@@ -94,9 +95,11 @@ class TenantLoginController extends Controller
     }
 
     public function showUserDashboard()
-    {
+    {   
+        $announcements = Announcement::where('is_active', true)->latest()->take(5)->get();
+
         $user = Auth::user();
-        return view('tenant.user.userDashboard');  
+        return view('tenant.user.userDashboard', compact('announcements'));  
     }
 }
 

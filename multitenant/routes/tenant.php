@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use App\Http\Controllers\Tenant\ComplaintController;
 use App\Http\Controllers\Tenant\UserRoomController;
+use App\Http\Controllers\Tenant\AnnouncementController;
 
 /*
 |--------------------------------------------------------------------------
@@ -94,7 +95,7 @@ Route::middleware([
         Route::get('/admin/dashboard', [AdminController::class, 'index'])->name('tenant.admin.dashboard');
         Route::get('/user/dashboard', [TenantLoginController::class, 'showUserDashboard'])->name('tenant.user.userDashboard');
         Route::get('/admin/users', [AdminController::class, 'users'])->name('tenant.admin.users');
-
+        
         Route::get('/complaints/create', [ComplaintController::class, 'create'])->name('tenant.user.complaints.create');
         Route::post('/complaints', [ComplaintController::class, 'store'])->name('tenant.user.complaints.store');
 
@@ -102,6 +103,8 @@ Route::middleware([
         Route::get('/user/rooms', [UserRoomController::class, 'index'])->name('tenant.user.rooms.index');
         Route::post('/user/rooms/rent/{id}', [UserRoomController::class, 'rent'])->name('tenant.user.rooms.rent');
 
+        Route::get('/announcements', [AnnouncementController::class, 'index'])->name('tenant.admin.announcements');
+        Route::post('/announcements', [AnnouncementController::class, 'store'])->name('tenant.admin.announcements.store');
         
         // Room management
         Route::prefix('admin/rooms')->group(function () {

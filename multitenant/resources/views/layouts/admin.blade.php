@@ -94,6 +94,10 @@
         <i class="fa-solid fa-user"></i> User
     </a>
 
+    <a href="{{ route('tenant.admin.announcements') }}" class="{{ request()->routeIs('tenant.admin.announcements*') ? 'active' : '' }}">
+        <i class="fa fa-bullhorn" aria-hidden="true"></i> Announcement
+    </a>
+
     
     <form method="POST" action="{{ route('tenant.logout') }}" class="mt-auto">
         @csrf

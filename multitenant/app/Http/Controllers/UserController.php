@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
+use App\Models\Announcement;
 
 class UserController extends Controller
 {
@@ -13,7 +14,8 @@ class UserController extends Controller
      */
     public function index()
     {
-        //
+        $announcements = Announcement::where('is_active', true)->latest()->take(5)->get();
+        return view('tenant.user.userDashboard', compact('announcements'));
     }
 
     /**
