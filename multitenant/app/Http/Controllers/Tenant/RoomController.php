@@ -16,6 +16,8 @@ use Stancl\Tenancy\Contracts\Tenant;
 use Illuminate\Support\Facades\DB;
 use App\Models\User; 
 use App\Models\Tenant\RoomRental;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\RentReminderMail;
 
 class RoomController extends Controller
 {
@@ -184,5 +186,27 @@ class RoomController extends Controller
         return back()->with('success', 'Marked as paid');
     }
 
+    public function sendReminder($rentalId)
+    {
+        // Ensure only Pro users can send reminders
+        if (tenant()->plan !== 'pro') {
+            abort(403, 'Upgrade to Pro to send reminders.');
+        }
+
+        // Find the rental record
+        $rental = RoomRental::with(['user', 'room'])->findOrFail($rentalId);
+
+        // Check if the user has an email
+        if (!$rental->user->email) {
+            return back()->with('error', 'User email not found.');
+        }
+
+        // Send the reminder email
+        Mail::to($rental->user->email)->send(new RentReminderMail($rental));
+
+        // Return a success message
+        return back()->with('success', 'Rent reminder sent to ' . $rental->user->email);
+    }
+    
 }
 

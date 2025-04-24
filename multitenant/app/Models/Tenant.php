@@ -11,8 +11,6 @@ class Tenant extends BaseTenant implements TenantWithDatabase
 {
     use HasDatabase, HasDomains;
 
-    
-    
     public function admins()
     {
         return $this->hasMany(Admin::class); 
@@ -20,6 +18,8 @@ class Tenant extends BaseTenant implements TenantWithDatabase
 
     protected $table = 'tenants';
 
-
+    public function isPro(){
+        return $this->plan === 'pro';
+    }
 
 }

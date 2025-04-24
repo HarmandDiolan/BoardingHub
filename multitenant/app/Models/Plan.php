@@ -9,7 +9,7 @@ class Plan extends Model
 {
     protected $casts = ['features' => 'array'];
 
-    protected $fillable = ['name', 'price', 'duration'];
+    protected $fillable = ['name', 'price', 'features'];
 
     public function tenants()
     {

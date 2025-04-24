@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\SubdomainController;
 use App\Http\Controllers\TenantLoginController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\TenantPlanController;
 
 foreach (config('tenancy.central_domains') as $domain) {
     Route::domain($domain)->group(function () {
@@ -19,15 +20,17 @@ foreach (config('tenancy.central_domains') as $domain) {
         Route::delete('/subdomain/{id}', [SubdomainController::class, 'destroy'])->name('subdomain.destroy');
 
 
-        Route::post('subdomain/{id}/upgrade', [SubdomainController::class, 'upgradePlan'])->name('subdomain.upgradePlan');
-
+        Route::post('/tenant/{tenantId}/upgrade', [TenantPlanController::class, 'upgrade'])->name('tenants.upgrade');
 
         Route::domain('tenant.localhost')->middleware(['auth'])->group(function () {
             Route::get('/admin/dashboard', [AdminController::class, 'index'])->name('tenant.admin.dashboard');
         });
         
-        
-        // Tenant login routes
+        Route::middleware(['checkProPlan'])->group(function () {
+            Route::get('/pro-feature', function () {
+                
+            });
+        });
 
     });
 }

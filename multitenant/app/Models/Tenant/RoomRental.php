@@ -18,9 +18,12 @@ class RoomRental extends Model
 
     protected $connection = 'tenant';
 
+    protected $dates = ['due_date'];
+
+
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'rented_by');
     }
 
     public function room()

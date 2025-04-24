@@ -124,7 +124,7 @@ class SubdomainController extends Controller
 
         $password = 'password'; //if random just change the 'password' to 'Str::random(12)'
 
-        $plan = Plan::where('name', 'free')->first();
+        $plan = $request->plan ?? 'free';
 
         if (!$plan) {
             return back()->with('error', 'Requested plan not available.');
@@ -134,7 +134,7 @@ class SubdomainController extends Controller
         $tenant = Tenant::create([
             'id' => $request->subdomain, 
             'tenancy_db_name' => 'tenant' . Str::ucfirst($request->subdomain), 
-            'plan_id' =>  $plan->id,
+            'plan' => $request->plan,
         ]);
 
         $tenant->domains()->create(['domain' => $request->subdomain . '.localhost']);
@@ -166,24 +166,6 @@ class SubdomainController extends Controller
 
         return back()->with('success', 'Tenant approved and database created.');
     }
-
-
-    public function upgradePlan(Request $request, $id)
-    {
-        $tenant = Tenant::where('id', $id)->firstOrFail();
-    
-        $plan = Plan::find($request->plan_id);
-    
-        if (!$plan) {
-            return back()->with('error', 'Selected plan not found.');
-        }
-    
-        $tenant->plan_id = $plan->id;
-        $tenant->save();
-    
-        return back()->with('success', 'Plan upgraded successfully!');
-    }
-    
 
     
 }

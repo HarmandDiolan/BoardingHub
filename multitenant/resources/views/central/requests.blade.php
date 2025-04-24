@@ -46,13 +46,17 @@
                                     </button>
                                 </form>
                                 @endif
-                                <form action="{{ route('subdomain.upgradePlan', $request->id) }}" method="POST">
-                                    @csrf
-                                    <input type="hidden" name="plan_id" value="2"> 
-                                    <button type="submit" style="border: none; background: transparent;" title="Upgrade Plan">
-                                        <i class="fa fa-credit-card text-primary"></i>
-                                    </button>
-                                </form>
+                                @if($request->tenant)
+                                    <form action="{{ route('tenants.upgrade', $request->id) }}" method="POST" class="d-inline">
+                                        @csrf
+                                        <input type="hidden" name="plan" value="pro">
+                                        <button type="submit" style="border: none; background: transparent;" title="Upgrade to Pro">
+                                            <i class="fa fa-credit-card text-primary"></i>
+                                        </button>
+                                    </form>
+                                @else
+                                    <span class="text-muted small">No tenant yet</span>
+                                @endif
                                 <form action="{{ route('subdomain.destroy', $request->subdomain) }}" method="POST">
                                     @csrf
                                     @method('DELETE')

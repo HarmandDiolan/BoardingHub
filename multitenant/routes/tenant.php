@@ -121,6 +121,9 @@ Route::middleware([
 
 
         });
+
+        Route::post('tenant/rentals/remind/{rentalId}', [RoomController::class, 'sendReminder'])
+        ->name('tenant.rentals.remind');
         
         // User management
         Route::get('users/create', [UserController::class, 'create'])->name('users.create');
