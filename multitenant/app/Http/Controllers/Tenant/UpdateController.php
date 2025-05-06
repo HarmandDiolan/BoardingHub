@@ -43,51 +43,75 @@ class UpdateController extends Controller
     public function updateSystem()
     {
         try {
-            // Log the start of the update process
             Log::info('Update process started.');
-    
-            // Access the current tenant through the tenant() helper
+
             $tenant = tenant();
-    
-            // Check if the tenant exists
+
             if (!$tenant) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Tenant not found or invalid tenant context.',
                 ], 400);
             }
-    
-            // Run the tenants:migrate command to update the tenant database
-            $migrateResult = Artisan::call('tenants:migrate');  // This is the correct command for multi-tenant migrations
-            $migrateOutput = Artisan::output();
-            
-            Log::info('Migration result: ' . $migrateOutput);
-    
-            // Run other necessary commands
+
+            // Step 1: Get latest release tag from GitHub
+            $response = Http::get('https://api.github.com/repos/HarmandDiolan/BoardingHub/releases/latest');
+            if (!$response->successful()) {
+                Log::error('GitHub API error', ['status' => $response->status(), 'response' => $response->body()]);
+                return response()->json(['error' => 'Error fetching update information.'], 500);
+            }
+
+            $latestVersion = $response->json()['tag_name'];
+            Log::info("Latest version from GitHub: $latestVersion");
+
+            // Step 2: Pull latest code and checkout to the tag
+            $basePath = base_path();
+            exec("cd $basePath && git fetch --tags 2>&1", $gitFetchOutput, $gitFetchStatus);
+            exec("cd $basePath && git checkout $latestVersion 2>&1", $gitCheckoutOutput, $gitCheckoutStatus);
+
+            Log::info('Git Fetch Output: ' . implode("\n", $gitFetchOutput));
+            Log::info('Git Checkout Output: ' . implode("\n", $gitCheckoutOutput));
+
+            if ($gitCheckoutStatus !== 0) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Git checkout failed. Check logs for details.',
+                ], 500);
+            }
+
+            // Step 3: Run composer install
+            exec("cd $basePath && composer install --no-dev --optimize-autoloader 2>&1", $composerOutput, $composerStatus);
+            Log::info('Composer Output: ' . implode("\n", $composerOutput));
+
+            if ($composerStatus !== 0) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Composer install failed. Check logs for details.',
+                ], 500);
+            }
+
+            // Step 4: Run tenant migration
+            Artisan::call('tenants:migrate', [
+                '--tenants' => [$tenant->id],
+                '--force' => true,
+            ]);
+            Log::info('Migration result: ' . Artisan::output());
+
+            // Step 5: Optimize app
             Artisan::call('optimize');
-            $optimizeOutput = Artisan::output();
-    
             Artisan::call('config:cache');
-            $configCacheOutput = Artisan::output();
-    
             Artisan::call('route:cache');
-            $routeCacheOutput = Artisan::output();
-    
-            // Log all outputs for debugging
-            Log::info('Optimization result: ' . $optimizeOutput);
-            Log::info('Config cache result: ' . $configCacheOutput);
-            Log::info('Route cache result: ' . $routeCacheOutput);
-    
-            // Optionally update the tenant's version
-            $tenant->update(['version' => 'new_version_here']);  // Replace with actual version
-            Log::info('Tenant version updated.');
-    
+            Log::info('Optimization and cache cleared.');
+
+            // Step 6: Update tenant version in DB
+            $tenant->update(['version' => $latestVersion]);
+            Log::info('Tenant version updated to ' . $latestVersion);
+
             return response()->json([
                 'success' => true,
-                'message' => 'System updated successfully.',
+                'message' => 'System updated to version ' . $latestVersion,
             ]);
         } catch (\Exception $e) {
-            // Log detailed error for debugging
             Log::error('Error during system update: ' . $e->getMessage(), ['exception' => $e]);
             return response()->json([
                 'success' => false,
@@ -95,6 +119,5 @@ class UpdateController extends Controller
             ], 500);
         }
     }
-    
-    
+
 }
