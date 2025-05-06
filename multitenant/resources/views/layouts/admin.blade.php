@@ -10,6 +10,17 @@
     <style>
         body {
             font-family: 'Segoe UI', sans-serif;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        /* Default light mode styles */
+        body {
+            background-color: white;
+            color: black;
+        }
+        /* Dark mode styles */
+        .dark body {
+            background-color: #121212;
+            color: white;
         }
         .sidebar {
             height: 100vh;
@@ -60,7 +71,21 @@
             background-color: #495057;
             color: #fff;
         }
-        
+        #darkModeToggle {
+            color: #ddd;
+            padding: 15px;
+            display: block;
+            text-decoration: none;
+            transition: all 0.3s;
+            background: none;
+            border: none;
+            width: 100%;
+            text-align: left;
+        }
+        #darkModeToggle:hover {
+            background-color: #495057;
+            color: #fff;
+        }
     </style>
 </head>
 <body>
@@ -99,7 +124,11 @@
         <i class="fa fa-bullhorn" aria-hidden="true"></i> Announcement
     </a>
 
-    
+    <!-- Dark Mode Toggle -->
+    <button id="darkModeToggle" class="p-2 bg-gray-200 dark:bg-gray-800 text-gray-800 dark:text-white">
+        Toggle Dark Mode
+    </button>
+
     <form method="POST" action="{{ route('tenant.logout') }}" class="mt-auto">
         @csrf
         <button type="submit" class="logout-btn">
@@ -116,6 +145,29 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 @stack('scripts')
+
+<script>
+    // Check if dark mode is enabled in localStorage
+    if (localStorage.getItem('dark-mode') === 'enabled') {
+        document.documentElement.classList.add('dark');
+    }
+
+    // Dark mode toggle button
+    const darkModeToggle = document.getElementById('darkModeToggle');
+
+    if (darkModeToggle) {
+        // Toggle dark mode on button click
+        darkModeToggle.addEventListener('click', () => {
+            if (document.documentElement.classList.contains('dark')) {
+                document.documentElement.classList.remove('dark');
+                localStorage.setItem('dark-mode', 'disabled');
+            } else {
+                document.documentElement.classList.add('dark');
+                localStorage.setItem('dark-mode', 'enabled');
+            }
+        });
+    }
+</script>
 
 </body>
 </html>
