@@ -18,6 +18,8 @@ use App\Models\User;
 use App\Models\Tenant\RoomRental;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\RentReminderMail;
+use App\Models\Tenant\Complaint;
+use Carbon\Carbon;
 
 class RoomController extends Controller
 {
@@ -206,6 +208,30 @@ class RoomController extends Controller
 
         // Return a success message
         return back()->with('success', 'Rent reminder sent to ' . $rental->user->email);
+    }
+
+    public function dashboard(){
+
+        $regularUsers = User::where('role', 'user')->count();
+        
+        $availableRooms = Room::where('status', 'available')->count();
+        $occupiedRooms = Room::where('status', 'occupied')->count();
+
+        $complaints = Complaint::selectRaw('MONTH(created_at) as month, COUNT(*) as count')->groupBy('month')->orderBy('month')->get();
+
+        $complaintDates = $complaints->pluck('month')->map(function ($month) {
+            return Carbon::create()->month($month)->format('F');
+        });
+
+        $complaintCounts = $complaints->pluck('count');
+
+        return view('tenant.admin.dashboard', compact(
+            'regularUsers',
+            'availableRooms',
+            'occupiedRooms',
+            'complaintDates',
+            'complaintCounts'
+        ));
     }
     
 }

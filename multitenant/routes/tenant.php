@@ -105,7 +105,9 @@ Route::middleware([
 
         Route::get('/announcements', [AnnouncementController::class, 'index'])->name('tenant.admin.announcements');
         Route::post('/announcements', [AnnouncementController::class, 'store'])->name('tenant.admin.announcements.store');
-        
+
+        Route::get('/admin/dashboard', [RoomController::class, 'dashboard'])->name('tenant.admin.dashboard');
+
         // Room management
         Route::prefix('admin/rooms')->group(function () {
             Route::get('/', [RoomController::class, 'index'])->name('tenant.admin.room');

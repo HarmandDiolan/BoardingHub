@@ -33,31 +33,40 @@
                 @csrf
 
                 <div class="mb-4">
-                    <label class="block text-gray-700 mb-1" for="email">Name</label>
-                    <input type="text" id="name" name="name" placeholder="Full Name" required
-                    class="w-full px-4 py-2 text-gray-700 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-300">
+                    <label class="block text-gray-700 mb-1" for="name">Name</label>
+                    <input type="text" id="name" name="name" value="{{ old('name') }}" placeholder="Full Name" required
+                        class="w-full px-4 py-2 text-gray-700 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-300">
+                    @error('name')
+                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                    @enderror
                 </div>
 
                 <div class="mb-4">
                     <label class="block text-gray-700 mb-1" for="email">Email</label>
-                    <input type="email" id="email" name="email" placeholder="you@example.com" required
-                    class="w-full px-4 py-2 text-gray-700 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-300">
+                    <input type="email" id="email" name="email" value="{{ old('email') }}" placeholder="you@example.com" required
+                        class="w-full px-4 py-2 text-gray-700 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-300">
+                    @error('email')
+                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                    @enderror
                 </div>
 
                 <div class="mb-4">
                     <label class="block text-gray-700 mb-1" for="password">Password</label>
                     <input type="password" id="password" name="password" placeholder="********" required
-                    class="w-full px-4 py-2 text-gray-700 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-300">
+                        class="w-full px-4 py-2 text-gray-700 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-300">
+                    @error('password')
+                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                    @enderror
                 </div>
 
                 <div class="mb-6">
                     <label class="block text-gray-700 mb-1" for="password_confirmation">Confirm Password</label>
                     <input type="password" id="password_confirmation" name="password_confirmation" placeholder="********" required
-                    class="w-full px-4 py-2 text-gray-700 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-300">
+                        class="w-full px-4 py-2 text-gray-700 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-300">
                 </div>
 
                 <button type="submit"
-                        class="w-full py-3 text-white bg-indigo-600 hover:bg-indigo-700 rounded-md text-lg font-semibold transition duration-300 ease-in-out transform hover:-translate-y-0.5 hover:shadow-lg">
+                    class="w-full py-3 text-white bg-indigo-600 hover:bg-indigo-700 rounded-md text-lg font-semibold transition duration-300 ease-in-out transform hover:-translate-y-0.5 hover:shadow-lg">
                     Register
                 </button>
 
@@ -65,6 +74,7 @@
                     Already have an account? <a href="{{ route('tenant.login') }}" class="text-indigo-500 hover:underline">Login</a>
                 </p>
             </form>
+
         </div>
     </div>
 

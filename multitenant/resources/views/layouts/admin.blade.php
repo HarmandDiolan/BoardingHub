@@ -60,6 +60,7 @@
             background-color: #495057;
             color: #fff;
         }
+        
     </style>
 </head>
 <body>

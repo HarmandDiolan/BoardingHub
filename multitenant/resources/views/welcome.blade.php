@@ -4,7 +4,7 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <title>Laravel</title>
+        <title>BoardingHub | Tenant Registration</title>
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
@@ -36,31 +36,40 @@
                     @endauth
                 </nav>
             @endif
+            
         </header>
 
+
         <div class="flex flex-col overflow-auto min-h-screen">
-    
-        </div>
-        <main class="flex flex-col lg:flex-row w-full max-w-4xl gap-8 justify-center">
+            <h1 class="text-4xl font-bold text-white">
+                    Boarding<span class="bg-orange-500 text-white px-2 py-1 rounded">Hub</span>
+                </h1>
+                <p class="text-lg text-gray-700 mt-2">Welcome to BoardingHub Tenant Registration</p>
+            
+            <main class="flex flex-col lg:flex-row w-full max-w-4xl gap-8 justify-center">
                 <!-- Form Section -->
-                <form action="{{ route('subdomain.store') }}" method="post" class="w-full max-w-md bg-white p-6 rounded-lg shadow-lg">
+                <form action="{{ route('subdomain.store') }}" method="post" class="w-full max-w-md bg-white p-8 rounded-lg shadow-lg">
                     @csrf
-                    <div class="mb-4">
-                        <label for="subdomain" class="block text-lg font-semibold text-gray-700">Subdomain</label>
-                        <div class="flex items-center space-x-3">
-                            <input type="text" name="name" id="subdomain" class="p-3 w-full border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Full Name" required>
-                            <input type="email" name="email" id="subdomain" class="p-3 w-full border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Email" required>
-                        </div>
-                        <input type="text" name="subdomain" id="subdomain" class="p-3 w-full border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Enter your subdomain" required>
-                        <button type="submit" class="bg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow">
-                                Save
-                            </button>
+                    <h2 class="text-3xl font-semibold text-center text-gray-800 mb-8">Create Your Tenant Account</h2>
+                    <div class="mb-6">
+                        <label for="name" class="block text-lg font-semibold text-gray-700">Full Name</label>
+                        <input type="text" name="name" id="name" class="p-3 w-full border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Your Full Name" required>
                     </div>
+                    <div class="mb-6">
+                        <label for="email" class="block text-lg font-semibold text-gray-700">Email Address</label>
+                        <input type="email" name="email" id="email" class="p-3 w-full border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Your Email Address" required>
+                    </div>
+                    <div class="mb-6">
+                        <label for="subdomain" class="block text-lg font-semibold text-gray-700">Subdomain</label>
+                        <input type="text" name="subdomain" id="subdomain" class="p-3 w-full border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Enter Your Subdomain" required>
+                    </div>
+                    <button type="submit" class="w-full bg-indigo-600 text-white py-3 rounded-md hover:bg-indigo-700 transition duration-300 ease-in-out">Save</button>
                 </form>
             </main>
+        </div>
+
         @if (Route::has('login'))
             <div class="h-14.5 hidden lg:block"></div>
         @endif
-
     </body>
 </html>
