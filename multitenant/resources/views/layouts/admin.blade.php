@@ -128,7 +128,11 @@
     <button id="darkModeToggle" class="p-2 bg-gray-200 dark:bg-gray-800 text-gray-800 dark:text-white">
         Toggle Dark Mode
     </button>
-
+    
+    <a href="{{ route('tenant.admin.settings') }}" class="{{ request()->routeIs('tenant.admin.settings') ? 'active' : '' }}">
+        <i class="fas fa-cogs me-2"></i> Settings
+    </a>
+    
     <form method="POST" action="{{ route('tenant.logout') }}" class="mt-auto">
         @csrf
         <button type="submit" class="logout-btn">

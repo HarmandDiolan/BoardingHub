@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Schema;
 use App\Http\Controllers\Tenant\ComplaintController;
 use App\Http\Controllers\Tenant\UserRoomController;
 use App\Http\Controllers\Tenant\AnnouncementController;
-
+use App\Http\Controllers\Tenant\UpdateController;
 /*
 |--------------------------------------------------------------------------
 | Tenant Routes
@@ -108,6 +108,12 @@ Route::middleware([
 
         Route::get('/admin/dashboard', [RoomController::class, 'dashboard'])->name('tenant.admin.dashboard');
 
+
+        Route::get('/check-update', [UpdateController::class, 'check']);
+
+        Route::get('/settings', [AdminController::class, 'settings'])->name('tenant.admin.settings');
+        Route::get('/update-system', [UpdateController::class, 'updateSystem']);
+        
         // Room management
         Route::prefix('admin/rooms')->group(function () {
             Route::get('/', [RoomController::class, 'index'])->name('tenant.admin.room');
