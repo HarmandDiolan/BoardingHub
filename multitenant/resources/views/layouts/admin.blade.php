@@ -129,8 +129,8 @@
         Toggle Dark Mode
     </button>
     
-    <a href="#" onclick="checkUpdate()" class="btn btn-warning mt-3">
-        <i class="fas fa-sync-alt me-1"></i> Check for Updates
+    <a href="{{ route('tenant.admin.settings') }}" class="{{ request()->routeIs('tenant.admin.settings') ? 'active' : '' }}">
+        <i class="fas fa-cogs me-2"></i> Settings
     </a>
     <form method="POST" action="{{ route('tenant.logout') }}" class="mt-auto">
         @csrf

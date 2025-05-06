@@ -26,5 +26,9 @@ class AdminController extends Controller
         return view('tenant.admin.user', compact('users'));
     }
     
+    public function settings()
+    {
+        return view('tenant.admin.settings');
+    }
     
 }
