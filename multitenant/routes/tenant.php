@@ -16,6 +16,8 @@ use Illuminate\Support\Facades\Schema;
 use App\Http\Controllers\Tenant\ComplaintController;
 use App\Http\Controllers\Tenant\UserRoomController;
 use App\Http\Controllers\Tenant\AnnouncementController;
+use App\Http\Controllers\Tenant\UpdateController;
+use Illuminate\Support\Facades\Http;
 
 /*
 |--------------------------------------------------------------------------
@@ -80,6 +82,21 @@ Route::middleware([
         return 'Tenant ID: ' . optional(tenant())->id;
     });
 
+    Route::get('/test-github-api', function () {
+        $response = Http::get('https://api.github.com/repos/HarmandDiolan/BoardingHub/releases/latest');
+    
+        if ($response->successful()) {
+            Log::info("GitHub response: " . $response->body());
+        } else {
+            Log::error("GitHub API request failed: " . $response->status());
+        }
+    
+        return response()->json([
+            'status' => $response->status(),
+            'body' => $response->body(),
+        ]);
+    });
+    
     // Authentication routes
     Route::get('tenant/register', [TenantLoginController::class, 'showRegisterForm'])->name('tenant.register.form');
     Route::post('tenant/register', [TenantLoginController::class, 'TenantRegister'])->name('tenant.register');
@@ -107,6 +124,8 @@ Route::middleware([
         Route::post('/announcements', [AnnouncementController::class, 'store'])->name('tenant.admin.announcements.store');
 
         Route::get('/admin/dashboard', [RoomController::class, 'dashboard'])->name('tenant.admin.dashboard');
+
+        Route::get('/check-update', [UpdateController::class, 'check']);
 
         // Room management
         Route::prefix('admin/rooms')->group(function () {

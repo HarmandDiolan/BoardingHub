@@ -128,7 +128,10 @@
     <button id="darkModeToggle" class="p-2 bg-gray-200 dark:bg-gray-800 text-gray-800 dark:text-white">
         Toggle Dark Mode
     </button>
-
+    
+    <a href="#" onclick="checkUpdate()" class="btn btn-warning mt-3">
+        <i class="fas fa-sync-alt me-1"></i> Check for Updates
+    </a>
     <form method="POST" action="{{ route('tenant.logout') }}" class="mt-auto">
         @csrf
         <button type="submit" class="logout-btn">
@@ -168,6 +171,23 @@
         });
     }
 </script>
+<script>
+    function checkUpdate() {
+        fetch('/check-update')
+            .then(response => response.json())
+            .then(data => {
+                if (data.update_available) {
+                    alert(`Update available! Latest version: ${data.latest_version}`);
+                } else {
+                    alert('You are up to date!');
+                }
+            })
+            .catch(error => {
+                console.error('Error checking for updates:', error);
+                alert('There was an error checking for updates.');
+            });
+    }
 
+</script>
 </body>
 </html>
