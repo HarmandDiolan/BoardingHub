@@ -113,7 +113,7 @@ Route::middleware([
 
         Route::get('/settings', [AdminController::class, 'settings'])->name('tenant.admin.settings');
         Route::get('/update-system', [UpdateController::class, 'updateSystem']);
-        
+
         // Room management
         Route::prefix('admin/rooms')->group(function () {
             Route::get('/', [RoomController::class, 'index'])->name('tenant.admin.room');
