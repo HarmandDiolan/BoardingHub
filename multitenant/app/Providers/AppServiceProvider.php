@@ -5,6 +5,8 @@ namespace App\Providers;
 use Illuminate\Support\ServiceProvider;
 use Stancl\Tenancy\Events\TenancyInitialized;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\View;
+use App\Http\Controllers\Tenant\ThemeController;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -27,5 +29,10 @@ class AppServiceProvider extends ServiceProvider
             }
         });
 
+        // Share theme settings with all views
+        View::composer('*', function ($view) {
+            $themeController = new ThemeController();
+            $view->with('theme', $themeController->getThemeSettings());
+        });
     }
 }

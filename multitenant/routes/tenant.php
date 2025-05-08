@@ -19,6 +19,7 @@ use App\Http\Controllers\Tenant\AnnouncementController;
 use App\Http\Controllers\Tenant\UpdateController;
 use Illuminate\Support\Facades\Http;
 use App\Http\Controllers\TenantPlanController;
+use App\Http\Controllers\Tenant\ThemeController;
 
 /*
 |--------------------------------------------------------------------------
@@ -130,7 +131,12 @@ Route::middleware([
         Route::get('/settings', [AdminController::class, 'settings'])->name('tenant.admin.settings');
         Route::get('/update-system', [UpdateController::class, 'updateSystem']);
 
-        Route::get('/export-pdf', [\App\Http\Controllers\PdfExportController::class, 'export']);
+        // Theme routes
+        Route::get('/admin/theme', [ThemeController::class, 'index'])->name('tenant.admin.theme');
+        Route::post('/admin/theme/update', [ThemeController::class, 'updateTheme'])->name('tenant.admin.theme.update');
+
+        // PDF Export routes
+        Route::get('/export-pdf/{report_type?}', [\App\Http\Controllers\PdfExportController::class, 'export'])->name('tenant.admin.export-pdf');
 
         // Room management
         Route::prefix('admin/rooms')->group(function () {
@@ -144,9 +150,9 @@ Route::middleware([
             
             Route::get('/rentals', [RoomController::class, 'rentalIndex'])->name('tenant.admin.rent.rentalIndex');
             Route::post('/rentals/{id}/mark-paid', [RoomController::class, 'markAsPaid'])->name('tenant.admin.rent.markAsPaid');
-            
+            Route::get('/reports', [PdfExportController::class, 'reportIndex'])->name('tenant.admin.reports.index');
 
-
+            Route::get('/export-pdf', [\App\Http\Controllers\PdfExportController::class, 'export'])->name('tenant.admin.export-pdf');
         });
 
         Route::post('tenant/rentals/remind/{rentalId}', [RoomController::class, 'sendReminder'])
@@ -176,44 +182,7 @@ Route::middleware([
         return response()->json($debugInfo);
     });
 
-    Route::post('/tenant/{tenantId}/upgrade', [TenantPlanController::class, 'upgrade'])->name('tenants.upgrade');
-    
-    // Route to directly upgrade the current tenant to pro
-    Route::get('/upgrade-to-pro', function () {
-        try {
-            $tenant = tenant();
-            $tenantId = $tenant->id;
-            
-            // Find the corresponding tenant request
-            $tenantRequest = \App\Models\TenantRequest::where('subdomain', $tenantId)->first();
-            
-            if (!$tenantRequest) {
-                return response()->json([
-                    'error' => 'Tenant request not found',
-                    'tenant_id' => $tenantId
-                ], 404);
-            }
-            
-            // Update tenant request plan
-            $tenantRequest->plan = 'pro';
-            $tenantRequest->save();
-            
-            // Update tenant data
-            $data = json_decode(json_encode($tenant->data), true) ?: [];
-            $data['plan'] = 'pro';
-            $tenant->data = $data;
-            $tenant->save();
-            
-            return response()->json([
-                'success' => true,
-                'message' => 'Tenant upgraded to Pro',
-                'tenant' => $tenant->toArray()
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
-            ], 500);
-        }
-    })->name('tenant.upgrade.to.pro');
+   
+
+ 
 });
