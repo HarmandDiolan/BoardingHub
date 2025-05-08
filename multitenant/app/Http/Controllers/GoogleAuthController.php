@@ -6,7 +6,8 @@ use Illuminate\Http\Request;
 use Laravel\Socialite\Facades\Socialite;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
-
+use FFI\Exception;
+use Illuminate\Support\Facades\Hash;
 
 class GoogleAuthController extends Controller
 {
@@ -18,43 +19,34 @@ class GoogleAuthController extends Controller
      */
     public function googleLogin()
     {
-        $tenantId = tenant()->id;
-    
-        $state = base64_encode(json_encode([
-            'tenant' => $tenantId,
-        ]));
-    
-        return Socialite::driver('google')
-            ->with(['state' => $state])
-            ->redirectUrl(config('services.google.redirect')) // this points to localhost:8000
-            ->redirect();
+        return Socialite::driver('google')->redirect();
     }
 
-    public function googleCallback(Request $request)
-    {
-        $state = json_decode(base64_decode($request->get('state')), true);
-        $tenantId = $state['tenant'] ?? null;
+    public function googleAuthentication(){
+        try{
+            $googleUser = Socialite::driver('google')->user();
+
+            $user = User::where('google_id', $googleUser->id)->first();
     
-        if (!$tenantId) {
-            abort(403, 'Missing tenant ID');
+            if($user){
+                Auth::login($user);
+                return redirect()->route('dashboard');
+            }else{
+                $userData = User::create([
+                    'name' => $googleUser->name,
+                    'email' => $googleUser->email,
+                    'password' => Hash::make('Password@1234'),
+                    'google_id' => $googleUser->id,
+                ]);
+    
+                if($userData){
+                    Auth::login($userData);
+                    return redirect()->route('dashboard');
+                }
+            }
+        } catch (Exception $e){
+            dd($e);
         }
-    
-        tenancy()->initialize($tenantId);
-    
-        $googleUser = Socialite::driver('google')->stateless()->user();
-    
-        $user = User::updateOrCreate(
-            ['email' => $googleUser->getEmail()],
-            [
-                'name' => $googleUser->getName(),
-                'google_id' => $googleUser->getId(),
-            ]
-        );
-    
-        Auth::login($user);
-    
-        return redirect('/dashboard');
     }
-    
 }
 
