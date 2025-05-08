@@ -22,10 +22,12 @@ foreach (config('tenancy.central_domains') as $domain) {
 
         Route::post('/tenant/{tenantId}/upgrade', [TenantPlanController::class, 'upgrade'])->name('tenants.upgrade');
 
+        
         Route::domain('tenant.localhost')->middleware(['auth'])->group(function () {
             Route::get('/admin/dashboard', [AdminController::class, 'index'])->name('tenant.admin.dashboard');
         });
         
+
         Route::middleware(['checkProPlan'])->group(function () {
             Route::get('/pro-feature', function () {
                 
