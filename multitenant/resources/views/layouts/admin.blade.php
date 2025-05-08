@@ -133,7 +133,15 @@
 <!-- Topbar -->
 <nav class="navbar navbar-expand fixed-top">
     <div class="container-fluid">
-        <a class="navbar-brand" href="{{ route('tenant.admin.dashboard') }}">Admin Dashboard</a>
+        <a class="navbar-brand d-flex align-items-center" href="{{ route('tenant.admin.dashboard') }}">
+            @if(isset($theme['logo_path']))
+                <img src="{{ Storage::url($theme['logo_path']) }}" 
+                     alt="Logo" 
+                     class="me-2"
+                     style="max-height: 40px;">
+            @endif
+            <span>Admin Dashboard</span>
+        </a>
         <div class="d-flex align-items-center">
             <span class="text-light me-3">Welcome, {{ Auth::user()->name }}</span>
         </div>

@@ -112,7 +112,9 @@
         $('#roomsTable').DataTable();
     });
 
+    function setDeleteFormAction(action) {
+        document.getElementById('confirmationForm').action = action;
+    }
 </script>
-
 
 @endsection

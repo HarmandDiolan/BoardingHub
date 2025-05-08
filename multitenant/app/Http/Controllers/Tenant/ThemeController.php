@@ -23,10 +23,10 @@ class ThemeController extends Controller
             'text_color' => 'required|string',
             'font_family' => 'required|string',
             'navbar_style' => 'required|string',
-            'card_style' => 'required|string'
+            'card_style' => 'required|string',
+            'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
 
-        // Save theme settings to JSON file
         $themeSettings = [
             'primary_color' => $request->primary_color,
             'secondary_color' => $request->secondary_color,
@@ -37,6 +37,23 @@ class ThemeController extends Controller
             'card_style' => $request->card_style,
             'updated_at' => now()->toDateTimeString()
         ];
+
+        // Handle logo upload
+        if ($request->hasFile('logo')) {
+            // Delete old logo if exists
+            if (isset($this->getThemeSettings()['logo_path'])) {
+                Storage::disk('public')->delete($this->getThemeSettings()['logo_path']);
+            }
+
+            $logoPath = $request->file('logo')->store('theme/logos', 'public');
+            $themeSettings['logo_path'] = $logoPath;
+        } else {
+            // Keep existing logo if no new one uploaded
+            $existingSettings = $this->getThemeSettings();
+            if (isset($existingSettings['logo_path'])) {
+                $themeSettings['logo_path'] = $existingSettings['logo_path'];
+            }
+        }
 
         Storage::disk('public')->put('theme/settings.json', json_encode($themeSettings));
 
@@ -57,7 +74,8 @@ class ThemeController extends Controller
             'text_color' => '#ffffff',
             'font_family' => 'Segoe UI',
             'navbar_style' => 'dark',
-            'card_style' => 'default'
+            'card_style' => 'default',
+            'logo_path' => null
         ];
     }
 } 

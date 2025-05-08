@@ -16,16 +16,37 @@
                         </div>
                     @endif
 
-                    <form method="POST" action="{{ route('tenant.admin.theme.update') }}">
+                    <form method="POST" action="{{ route('tenant.admin.theme.update') }}" enctype="multipart/form-data">
                         @csrf
 
+                        <div class="mb-4">
+                            <label for="logo" class="form-label">Logo</label>
+                            <div class="d-flex align-items-center gap-3">
+                                @if(isset($themeSettings['logo_path']))
+                                    <img src="{{ Storage::url($themeSettings['logo_path']) }}" 
+                                         alt="Current Logo" 
+                                         class="img-thumbnail" 
+                                         style="max-height: 50px;">
+                                @endif
+                                <input type="file" 
+                                       class="form-control" 
+                                       id="logo" 
+                                       name="logo" 
+                                       accept="image/*">
+                            </div>
+                            <small class="text-muted">Recommended size: 200x50px. Max size: 2MB</small>
+                            @error('logo')
+                                <div class="text-danger mt-1">{{ $message }}</div>
+                            @enderror
+                        </div>
+
                         <div class="mb-3">
-                            <label for="primary_color" class="form-label">Primary Color</label>
+                            <label for="primary_color" class="form-label">Topbar Color</label>
                             <input type="color" class="form-control form-control-color" id="primary_color" name="primary_color" value="{{ $themeSettings['primary_color'] }}">
                         </div>
 
                         <div class="mb-3">
-                            <label for="secondary_color" class="form-label">Secondary Color</label>
+                            <label for="secondary_color" class="form-label">Active Color</label>
                             <input type="color" class="form-control form-control-color" id="secondary_color" name="secondary_color" value="{{ $themeSettings['secondary_color'] }}">
                         </div>
 
