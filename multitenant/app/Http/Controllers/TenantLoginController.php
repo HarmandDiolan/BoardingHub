@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use App\Models\Announcement;
+use Illuminate\Support\Facades\Log;
+
 
 class TenantLoginController extends Controller
 {
@@ -76,15 +78,24 @@ class TenantLoginController extends Controller
                 'role' => 'user',
             ]);
 
+            // Log success
+            Log::info('User registered successfully: ' . $user->email);
+
             DB::commit();
 
             Auth::login($user);
 
-            return redirect()->route('tenant.users.userDashboard')->with('success', 'Tenant registered successfully!');
+            return redirect()->route('tenant.users.userDashboard')->with('success', 'Account registered successfully!');
         } catch (\Exception $e) {
             DB::rollBack();
 
-            return redirect()->back()->withErrors(['error' => 'An error occurred while registering the tenant.']);
+            // Log the exception
+            Log::error('Error registering user: ' . $e->getMessage(), [
+                'exception' => $e,
+                'request' => $request->all()
+            ]);
+
+            return redirect()->back()->withErrors(['error' => 'An error occurred while registering the account.']);
         }
     }
 

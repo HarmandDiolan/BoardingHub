@@ -140,6 +140,8 @@ Route::middleware([
         // PDF Export routes
         Route::get('/export-pdf/{report_type?}', [\App\Http\Controllers\PdfExportController::class, 'export'])->name('tenant.admin.export-pdf');
 
+        Route::get('/tenant/users/dashboard', [TenantLoginController::class, 'showUserDashboard'])->name('tenant.users.userDashboard');
+
         // Room management
         Route::prefix('admin/rooms')->group(function () {
             Route::get('/', [RoomController::class, 'index'])->name('tenant.admin.room');

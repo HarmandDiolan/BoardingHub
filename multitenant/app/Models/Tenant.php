@@ -22,4 +22,9 @@ class Tenant extends BaseTenant implements TenantWithDatabase
         return $this->plan === 'pro';
     }
 
+    public function request()
+    {
+        return $this->hasOne(TenantRequest::class);
+    }
+
 }

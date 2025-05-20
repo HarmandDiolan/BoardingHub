@@ -4,21 +4,12 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use App\Http\Requests\StoreThemeRequest;
 
 class ThemeController extends Controller
 {
-    public function updateTheme(Request $request)
+    public function updateTheme(StoreThemeRequest $request)
     {
-        $request->validate([
-            'primary_color' => 'required|string',
-            'secondary_color' => 'required|string',
-            'sidebar_color' => 'required|string',
-            'text_color' => 'required|string',
-            'font_family' => 'required|string',
-            'navbar_style' => 'required|string',
-            'card_style' => 'required|string'
-        ]);
-
         // Save theme settings to JSON file
         $themeSettings = [
             'primary_color' => $request->primary_color,
